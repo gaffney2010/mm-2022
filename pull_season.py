@@ -1,15 +1,15 @@
 ################################################################################
 # Logging logic, must come first
-SAFE_MODE = True
+SAFE_MODE = False
 from tools.logger import configure_logging
 
 import logging
-configure_logging(SAFE_MODE, logging_level=logging.DEBUG)
+configure_logging(screen=False, file=True, screen_level=logging.DEBUG, file_level=logging.WARNING)
 ################################################################################
 
 from datetime import datetime
 import sys
-from typing import Dict, List
+from typing import Dict, List, Set
 
 import attr
 from bs4 import BeautifulSoup
@@ -60,7 +60,8 @@ def get_reg_season_school(school_dict: Dict[str, School], school: School, year: 
                 raise Exception("Bad df")
     except:
         _, _, exc_traceback = sys.exc_info()
-        logger.log_error(f"Error opening school {school}", exc_traceback, stop_program=True)
+        logger.log_error(f"Error opening school {school}, skipped it", exc_traceback, stop_program=False)
+        return []
 
     all_games = list()
     count_games = 0
@@ -72,8 +73,11 @@ def get_reg_season_school(school_dict: Dict[str, School], school: School, year: 
         try:
             opponent = school_dict[row["Opponent"].split("\xa0")[0]]
         except:
-            logger.log_error(f"Couldn't find key for school {row['Opponent']} found on school {school}", stop_program=False)
-            continue
+            logger.log_error(
+                f"Couldn't find key for school {row['Opponent']} found on school {school}, continuing with non_key",
+                stop_program=False
+            )
+            opponent = row["Opponent"].split("\xa0")[0].replace(" ", "-").upper()
 
         outcome = row["Unnamed: 7"]
         if outcome == "W":
@@ -96,11 +100,20 @@ def get_reg_season_school(school_dict: Dict[str, School], school: School, year: 
     return all_games
 
 
+def scrape_season(year: Year) -> Set[Game]:
+    school_dict = get_schools(year)
 
-school_dict = get_schools(2021)
-school = "west-virginia"
-year = 2021
-logging.debug(get_reg_season_school(school_dict, school, year))
+    all_games = set()
+    for _, school in school_dict.items():
+        logging.debug(logger.log_section(_))
+        logging.debug(_)
+        for game in get_reg_season_school(school_dict, school, year):
+            all_games.add(game)
 
+    return all_games
+
+
+logging.warning(logger.log_section("New run for 2021"))
+_ = scrape_season(2021)
 
 logging.debug("GOODBYE")
