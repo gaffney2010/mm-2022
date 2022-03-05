@@ -8,6 +8,7 @@ configure_logging(SAFE_MODE, logging_level=logging.DEBUG)
 ################################################################################
 
 from datetime import datetime
+import sys
 from typing import Dict, List
 
 import attr
@@ -15,7 +16,7 @@ from bs4 import BeautifulSoup
 import dateutil
 import pandas as pd
 
-from tools import scraper_tools
+from tools import logger, scraper_tools
 
 
 # TODO: Rename these.
@@ -50,17 +51,30 @@ def get_schools(year: Year) -> Dict[str, School]:
     return schools
 
 
-# TODO: Handle errors better
 def get_reg_season_school(school_dict: Dict[str, School], school: School, year: Year) -> List[Game]:
-    html = scraper_tools.read_url_to_string(SCHEDULE.format(school, year))
-    df = pd.read_html(html)[-1]
+    try:
+        html = scraper_tools.read_url_to_string(SCHEDULE.format(school, year))
+        df = pd.read_html(html)[-1]
+        for req in ("Type", "Opponent", "Unnamed: 7", "Date"):
+            if req not in df.columns:
+                raise Exception("Bad df")
+    except:
+        _, _, exc_traceback = sys.exc_info()
+        logger.log_error(f"Error opening school {school}", exc_traceback, stop_program=True)
 
     all_games = list()
+    count_games = 0
     for _, row in df.iterrows():
         if row["Type"] != "REG":
             continue
+        count_games += 1
 
-        opponent = school_dict[row["Opponent"].split("\xa0")[0]]
+        try:
+            opponent = school_dict[row["Opponent"].split("\xa0")[0]]
+        except:
+            logger.log_error(f"Couldn't find key for school {row['Opponent']} found on school {school}", stop_program=False)
+            continue
+
         outcome = row["Unnamed: 7"]
         if outcome == "W":
             winner, loser = school, opponent
@@ -68,12 +82,16 @@ def get_reg_season_school(school_dict: Dict[str, School], school: School, year: 
             winner, loser = opponent, school
         else:
             # Unanticipated error
-            raise Exception
+            logger.log_error(f"Unanticipated outcome: {row['Unnamed: 7']} found on school {school}", stop_program=False)
 
         date = dateutil.parser.parse(row["Date"])
 
         game = Game(winner=winner, loser=loser, date=date)
         all_games.append(game)
+
+    if count_games < 20:
+        # This seems like an error.
+        logger.log_error(f"School {school} has fewer than 20 games.", stop_program=False)
 
     return all_games
 

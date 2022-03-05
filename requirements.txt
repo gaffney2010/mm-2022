@@ -4,3 +4,4 @@ lxml
 pandas
 retrying
 selenium
+traceback

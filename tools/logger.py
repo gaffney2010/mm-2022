@@ -2,7 +2,13 @@ from datetime import datetime
 import logging
 import os
 
+import traceback
+
 from constants import *
+
+
+class StoppingError(Exception):
+    pass
 
 
 def log_section(section_header: str) -> None:
@@ -16,6 +22,20 @@ def log_section(section_header: str) -> None:
     logging.info("=" * width)
     logging.info("=" * left_margin + section_header.upper() + "=" * right_margin)
     logging.info("=" * width)
+
+
+def log_error(
+    error_msg: str,
+    exc_traceback = None,
+    stop_program: bool = True
+) -> None:
+    logging.error(error_msg)
+    if exc_traceback is not None:
+        logging.error("Stack trace:")
+        for l in traceback.format_tb(exc_traceback):
+            logging.error(l)
+    if stop_program:
+        raise StoppingError
 
 
 def configure_logging(safe_mode: bool, logging_level = logging.INFO) -> None:
