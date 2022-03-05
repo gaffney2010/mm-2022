@@ -61,6 +61,7 @@ def get_reg_season_school(school: School, year: Year) -> List[Game]:
             if req not in df.columns:
                 raise Exception("Bad df")
     except:
+        # TODO: Check for a link on that cell.
         _, _, exc_traceback = sys.exc_info()
         logger.log_error(f"Error opening school {school}, skipped it", exc_traceback, stop_program=False)
         return []
@@ -95,9 +96,9 @@ def get_reg_season_school(school: School, year: Year) -> List[Game]:
         game = Game(winner=winner, loser=loser, date=date)
         all_games.append(game)
 
-    if count_games < 20:
+    if count_games < 10:
         # This seems like an error.
-        logger.log_error(f"School {school} has fewer than 20 games.", stop_program=False)
+        logger.log_error(f"School {school} has fewer than 10 games.", stop_program=False)
 
     return all_games
 
@@ -115,7 +116,8 @@ def scrape_season(year: Year) -> Set[Game]:
     return all_games
 
 
-logging.warning(logger.log_section("New run for 2021"))
-_ = scrape_season(2021)
+year = 2019
+logging.warning(logger.log_section(f"New run for {year}"))
+_ = scrape_season(year)
 
 logging.debug("GOODBYE")
