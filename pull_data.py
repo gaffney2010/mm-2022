@@ -1,3 +1,12 @@
+################################################################################
+# Logging logic, must come first
+SAFE_MODE = True
+from tools.logger import configure_logging
+
+import logging
+configure_logging(SAFE_MODE, logging_level=logging.DEBUG)
+################################################################################
+
 from datetime import datetime
 from typing import Dict, List
 
@@ -24,7 +33,7 @@ class Game(object):
     date: datetime = attr.ib()
 
 
-print("HELLO")
+logging.debug("HELLO")
 
 
 def get_schools(year: Year) -> Dict[str, School]:
@@ -73,7 +82,7 @@ def get_reg_season_school(school_dict: Dict[str, School], school: School, year: 
 school_dict = get_schools(2021)
 school = "west-virginia"
 year = 2021
-print(get_reg_season_school(school_dict, school, year))
+logging.debug(get_reg_season_school(school_dict, school, year))
 
 
-print("GOODBYE")
+logging.debug("GOODBYE")
