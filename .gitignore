@@ -130,3 +130,7 @@ dmypy.json
 
 # Specific to this machine
 computer_constants.py
+
+# Don't need copies of this
+data
+logging
