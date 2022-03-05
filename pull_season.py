@@ -8,6 +8,7 @@ configure_logging(screen=False, file=True, screen_level=logging.DEBUG, file_leve
 ################################################################################
 
 from datetime import datetime
+import functools
 import sys
 from typing import Dict, List, Set
 
@@ -37,6 +38,7 @@ class Game(object):
 logging.debug("HELLO")
 
 
+@functools.lru_cache(100)
 def get_schools(year: Year) -> Dict[str, School]:
     # All schools in a given year mapped from representative string to the school
     html = scraper_tools.read_url_to_string(FULL_YEAR.format(year))
@@ -51,7 +53,7 @@ def get_schools(year: Year) -> Dict[str, School]:
     return schools
 
 
-def get_reg_season_school(school_dict: Dict[str, School], school: School, year: Year) -> List[Game]:
+def get_reg_season_school(school: School, year: Year) -> List[Game]:
     try:
         html = scraper_tools.read_url_to_string(SCHEDULE.format(school, year))
         df = pd.read_html(html)[-1]
@@ -71,7 +73,7 @@ def get_reg_season_school(school_dict: Dict[str, School], school: School, year: 
         count_games += 1
 
         try:
-            opponent = school_dict[row["Opponent"].split("\xa0")[0]]
+            opponent = get_schools(year)[row["Opponent"].split("\xa0")[0]]
         except:
             logger.log_error(
                 f"Couldn't find key for school {row['Opponent']} found on school {school}, continuing with non_key",
@@ -107,7 +109,7 @@ def scrape_season(year: Year) -> Set[Game]:
     for _, school in school_dict.items():
         logging.debug(logger.log_section(_))
         logging.debug(_)
-        for game in get_reg_season_school(school_dict, school, year):
+        for game in get_reg_season_school(school, year):
             all_games.add(game)
 
     return all_games
