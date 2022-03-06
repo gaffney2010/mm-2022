@@ -20,15 +20,15 @@ def train_model(featurizer: Featurizer, years: List[Year]) -> LogisticModel:
             y.append(1 if game.school_1_won else 0)
     X = pd.DataFrame(data=X_rows)
 
-    model = LogisticRegression(X, y).fit()
+    model = LogisticRegression().fit(X, y)
 
     return LogisticModel(featurizer=featurizer, model=model)
 
 
 def _infer_single_game(model: LogisticModel, game: PlayoffGame) -> float:
     # Average P(win) and 1-P(loss) to smooth some models.
-    p = model.model.predict(pd.DataFrame(data=[model.featurizer(game)]))
-    q = model.model.predict(pd.DataFrame(data=[model.featurizer(game.flip())]))
+    p = model.model.predict_proba(pd.DataFrame(data=[model.featurizer(game)]))[0, 0]
+    q = model.model.predict_proba(pd.DataFrame(data=[model.featurizer(game.flip())]))[0, 0]
     return (p + 1 - q) / 2.0
 
 
