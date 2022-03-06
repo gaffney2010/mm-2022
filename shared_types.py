@@ -6,6 +6,8 @@ import attr
 
 School = str
 Year = int
+# TODO: Replace type with sm.discrete.discrete_model.Logit
+LogRegType = Any
 
 
 @attr.s(frozen=True)
@@ -41,5 +43,4 @@ Featurizer = Callable[[PlayoffGame], Dict[str, float]]
 @attr.s(frozen=True)
 class LogisticModel(object):
     featurizer: Featurizer = attr.ib()
-    # TODO: Replace type with sm.discrete.discrete_model.Logit
-    model: Any = attr.ib()
+    model: LogRegType = attr.ib()

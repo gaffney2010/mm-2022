@@ -1,15 +1,5 @@
-################################################################################
-# Logging logic, must come first
-from tools.logger import configure_logging
-
-import logging
-
-configure_logging(
-    screen=True, file=False, screen_level=logging.DEBUG, file_level=logging.WARNING
-)
-################################################################################
-
 import collections
+import functools
 import hashlib
 import random
 import sys
@@ -102,6 +92,7 @@ def read_quadrant(html: str, year: Year, seeds_found) -> List[PlayoffGame]:
     return result
 
 
+@functools.lru_cache(100)
 def read_playoffs(year: Year) -> List[PlayoffGame]:
     random.seed(year)
 
