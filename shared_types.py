@@ -1,8 +1,7 @@
 from datetime import datetime
-from typing import Callable, Dict
+from typing import Any, Callable, Dict
 
 import attr
-import statsmodels as sm
 
 
 School = str
@@ -32,4 +31,5 @@ Featurizer = Callable[[PlayoffGame], Dict[str, float]]
 @attr.s(frozen=True)
 class LogisticModel(object):
     featurizer: Featurizer = attr.ib()
-    model: sm.discrete.discrete_model.Logit = attr.ib()
+    # TODO: Replace type with sm.discrete.discrete_model.Logit
+    model: Any = attr.ib()

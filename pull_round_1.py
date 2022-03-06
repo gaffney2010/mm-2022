@@ -21,7 +21,7 @@ from shared_types import *
 POST_SEASON = "https://www.sports-reference.com/cbb/postseason/{}-ncaa.html"
 
 
-def read_quadrant(html: str, seeds_found) -> List[PlayoffGame]:
+def read_quadrant(html: str, year: Year, seeds_found) -> List[PlayoffGame]:
     result = list()
     for i, game in enumerate(html.split("<!-- game -->")):
         # Before any tag there is no game.
@@ -108,15 +108,10 @@ def read_playoffs(year: Year) -> List[PlayoffGame]:
     result = list()
     # Each of 4 divisions start with <div id="bracket" class="team16">
     for div in soup.find_all("div", {"id": "bracket", "class": "team16"}):
-        result += read_quadrant(str(div), seeds_found)
+        result += read_quadrant(str(div), year, seeds_found)
 
     for k in range(1, 17):
         if k not in seeds_found or seeds_found[k] != 4:
             logger.log_error(f"Missing playoff games, found these seeds: {seeds_found}", stop_program=True)
     
     return result
-
-
-year = 2021
-print(read_playoffs(year))
-
