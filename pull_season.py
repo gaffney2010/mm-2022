@@ -1,6 +1,5 @@
 ################################################################################
 # Logging logic, must come first
-SAFE_MODE = False
 from tools.logger import configure_logging
 
 import logging
@@ -116,8 +115,8 @@ def scrape_season(year: Year) -> Set[Game]:
     return all_games
 
 
-year = 2019
-logging.warning(logger.log_section(f"New run for {year}"))
-_ = scrape_season(year)
+for year in range(2019, 2014, -1):
+    logging.warning(logger.log_section(f"New run for {year}"))
+    _ = scrape_season(year)
 
 logging.debug("GOODBYE")
