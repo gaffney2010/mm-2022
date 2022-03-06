@@ -10,7 +10,7 @@ from shared_types import *
 
 
 def train_model(featurizer: Featurizer, years: List[Year]) -> LogisticModel:
-    assert(len(years) > 0)
+    assert len(years) > 0
 
     X_rows = list()
     y = list()
@@ -33,7 +33,7 @@ def _infer_single_game(model: LogisticModel, game: PlayoffGame) -> float:
 
 
 def _infer(model: LogisticModel, years: List[Year]) -> Dict[PlayoffGame, float]:
-    assert(len(years) > 0)
+    assert len(years) > 0
 
     result = dict()
     for year in years:
@@ -46,7 +46,7 @@ def _infer(model: LogisticModel, years: List[Year]) -> Dict[PlayoffGame, float]:
 def _report_cross_entropy(history: Dict[PlayoffGame, float]) -> str:
     num, den = 0, 0
     for act, pred in history.items():
-        num += 1-pred if act.school_1_won else pred
+        num += 1 - pred if act.school_1_won else pred
         den += 1
     return f"Cross-entropy: {num/den}"
 
@@ -56,7 +56,7 @@ def _report_calibration(history: Dict[PlayoffGame, float], bins: int = 5) -> str
     for act, pred in history.items():
         bin = int(pred * bins)
         binning[bin].append((act, pred))
-    
+
     df_rows = list()
     for bin in range(bins):
         games = binning[bin]
@@ -74,7 +74,7 @@ def _report_calibration(history: Dict[PlayoffGame, float], bins: int = 5) -> str
         df_rows.append(row)
 
     df = pd.DataFrame(data=df_rows)
-    return tabulate(df, headers='keys')
+    return tabulate(df, headers="keys")
 
 
 def score_and_report(model: LogisticModel, years: List[Year]) -> None:
@@ -83,6 +83,8 @@ def score_and_report(model: LogisticModel, years: List[Year]) -> None:
     print(_report_calibration(history))
 
 
-def fit_and_score_and_report(featurizer: Featurizer, fit_years: List[Year], score_years: List[Year]) -> None:
+def fit_and_score_and_report(
+    featurizer: Featurizer, fit_years: List[Year], score_years: List[Year]
+) -> None:
     model = train_model(featurizer, fit_years)
     score_and_report(model, score_years)

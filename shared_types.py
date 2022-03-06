@@ -24,7 +24,7 @@ class PlayoffGame(object):
     school_2_seed: int = attr.ib()
     school_1_won: bool = attr.ib()
 
-    def flip(self) -> 'PlayoffGame':
+    def flip(self) -> "PlayoffGame":
         return PlayoffGame(
             year=self.year,
             school_1=self.school_2,

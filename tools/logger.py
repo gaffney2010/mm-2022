@@ -13,7 +13,7 @@ class StoppingError(Exception):
 
 def log_section(section_header: str) -> str:
     WIDTH = 30
-    width = max(WIDTH, len(section_header)+4)
+    width = max(WIDTH, len(section_header) + 4)
     left_margin = (width - len(section_header)) // 2
     right_margin = width - len(section_header) - left_margin
 
@@ -26,11 +26,7 @@ def log_section(section_header: str) -> str:
     return "".join(fmt)
 
 
-def log_error(
-    error_msg: str,
-    exc_traceback = None,
-    stop_program: bool = True
-) -> None:
+def log_error(error_msg: str, exc_traceback=None, stop_program: bool = True) -> None:
     if stop_program:
         logging.error(error_msg)
     else:
@@ -44,7 +40,12 @@ def log_error(
 
 
 # TODO: Fix this so that both work at once, pls.  (https://stackoverflow.com/questions/13733552/logger-configuration-to-log-to-file-and-print-to-stdout)
-def configure_logging(screen: bool = True, file: bool = False, screen_level=logging.INFO, file_level=logging.INFO) -> None:
+def configure_logging(
+    screen: bool = True,
+    file: bool = False,
+    screen_level=logging.INFO,
+    file_level=logging.INFO,
+) -> None:
     now = datetime.now()
     today = now.year * 10000 + now.month * 100 + now.day
 

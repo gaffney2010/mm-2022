@@ -41,7 +41,11 @@ def get_reg_season_school(school: School, year: Year) -> List[Game]:
     except:
         # TODO: Check for a link on that cell.
         _, _, exc_traceback = sys.exc_info()
-        logger.log_error(f"Error opening school {school}, skipped it", exc_traceback, stop_program=False)
+        logger.log_error(
+            f"Error opening school {school}, skipped it",
+            exc_traceback,
+            stop_program=False,
+        )
         return []
 
     all_games = list()
@@ -56,7 +60,7 @@ def get_reg_season_school(school: School, year: Year) -> List[Game]:
         except:
             logger.log_error(
                 f"Couldn't find key for school {row['Opponent']} found on school {school}, continuing with non_key",
-                stop_program=False
+                stop_program=False,
             )
             opponent = row["Opponent"].split("\xa0")[0].replace(" ", "-").upper()
 
@@ -67,7 +71,10 @@ def get_reg_season_school(school: School, year: Year) -> List[Game]:
             winner, loser = opponent, school
         else:
             # Unanticipated error
-            logger.log_error(f"Unanticipated outcome: {row['Unnamed: 7']} found on school {school}", stop_program=False)
+            logger.log_error(
+                f"Unanticipated outcome: {row['Unnamed: 7']} found on school {school}",
+                stop_program=False,
+            )
 
         date = dateutil.parser.parse(row["Date"])
 
@@ -76,7 +83,9 @@ def get_reg_season_school(school: School, year: Year) -> List[Game]:
 
     if count_games < 10:
         # This seems like an error.
-        logger.log_error(f"School {school} has fewer than 10 games.", stop_program=False)
+        logger.log_error(
+            f"School {school} has fewer than 10 games.", stop_program=False
+        )
 
     return all_games
 

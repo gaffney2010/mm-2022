@@ -3,7 +3,10 @@
 from tools.logger import configure_logging
 
 import logging
-configure_logging(screen=False, file=True, screen_level=logging.DEBUG, file_level=logging.WARNING)
+
+configure_logging(
+    screen=False, file=True, screen_level=logging.DEBUG, file_level=logging.WARNING
+)
 ################################################################################
 
 from models import model, seed

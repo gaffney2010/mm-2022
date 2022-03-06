@@ -3,7 +3,10 @@
 from tools.logger import configure_logging
 
 import logging
-configure_logging(screen=True, file=False, screen_level=logging.DEBUG, file_level=logging.WARNING)
+
+configure_logging(
+    screen=True, file=False, screen_level=logging.DEBUG, file_level=logging.WARNING
+)
 ################################################################################
 
 import collections
@@ -38,7 +41,9 @@ def read_quadrant(html: str, year: Year, seeds_found) -> List[PlayoffGame]:
             school_2_seed = int(school_split[2].split("<span>")[1].split("</span>")[0])
         except:
             _, _, exc_traceback = sys.exc_info()
-            logger.log_error(f"Malformed playoff game: {game}", exc_traceback, stop_program=False)
+            logger.log_error(
+                f"Malformed playoff game: {game}", exc_traceback, stop_program=False
+            )
 
         if school_1_seed + school_2_seed != 17:
             # Not first round
@@ -50,7 +55,10 @@ def read_quadrant(html: str, year: Year, seeds_found) -> List[PlayoffGame]:
         school_1_won = school_split[0].find("winner") != -1
         school_2_won = school_split[1].find("winner") != -1
         if not (school_1_won ^ school_2_won):
-            if hashlib.sha224(game.encode()).hexdigest() == "230081c2419c0304f6c4fa2ef6067b385ced1ea5f38968f1eeace101":
+            if (
+                hashlib.sha224(game.encode()).hexdigest()
+                == "230081c2419c0304f6c4fa2ef6067b385ced1ea5f38968f1eeace101"
+            ):
                 # Known exception: Oregon / VCU forfeit
                 continue
             # TODO: Better exceptions
@@ -62,7 +70,9 @@ def read_quadrant(html: str, year: Year, seeds_found) -> List[PlayoffGame]:
             school_1 = link_1["href"].split("/")[3]
         except:
             _, _, exc_traceback = sys.exc_info()
-            logger.log_error(f"Malformed playoff game: {game}", exc_traceback, stop_program=False)
+            logger.log_error(
+                f"Malformed playoff game: {game}", exc_traceback, stop_program=False
+            )
 
         try:
             soup_2 = BeautifulSoup(school_split[2], features="lxml")
@@ -70,7 +80,9 @@ def read_quadrant(html: str, year: Year, seeds_found) -> List[PlayoffGame]:
             school_2 = link_2["href"].split("/")[3]
         except:
             _, _, exc_traceback = sys.exc_info()
-            logger.log_error(f"Malformed playoff game: {game}", exc_traceback, stop_program=False)
+            logger.log_error(
+                f"Malformed playoff game: {game}", exc_traceback, stop_program=False
+            )
 
         game = PlayoffGame(
             year=year,
@@ -105,6 +117,9 @@ def read_playoffs(year: Year) -> List[PlayoffGame]:
 
     for k in range(1, 17):
         if k not in seeds_found or seeds_found[k] != 4:
-            logger.log_error(f"Missing playoff games for year {year}, found these seeds: {seeds_found}", stop_program=True)
-    
+            logger.log_error(
+                f"Missing playoff games for year {year}, found these seeds: {seeds_found}",
+                stop_program=True,
+            )
+
     return result

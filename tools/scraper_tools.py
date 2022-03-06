@@ -29,10 +29,11 @@ class WebDriver(object):
         if self._driver is None:
             logging.debug("Initializing driver.")
             options = webdriver.FirefoxOptions()
-            options.add_argument('--headless')
+            options.add_argument("--headless")
             self._driver = webdriver.Firefox(
                 options=options,
-                service_log_path="{}/geckodriver.log".format(LOGGING_DIR))
+                service_log_path="{}/geckodriver.log".format(LOGGING_DIR),
+            )
             logging.debug("Finished initializing driver.")
         return self._driver
 
@@ -44,7 +45,7 @@ class WebDriver(object):
 
 
 def read_url_to_string(url: str) -> str:
-    """ Read from a url and print to a string, after fully buffering.
+    """Read from a url and print to a string, after fully buffering.
     If errors after three tries, then will return an empty string.
     Args:
         url: The URL to read.
@@ -53,8 +54,7 @@ def read_url_to_string(url: str) -> str:
     """
 
     @cache.memoize(url, cache.BasicCacher())
-    @retrying.retry(wait_random_min=200, wait_random_max=400,
-                    stop_max_attempt_number=3)
+    @retrying.retry(wait_random_min=200, wait_random_max=400, stop_max_attempt_number=3)
     def read_url_to_string_helper(help_url, web_driver):
         web_driver.driver().get(help_url)
         time.sleep(DRIVER_DELAY_SEC)
