@@ -3,7 +3,7 @@ import random
 from typing import Dict, Tuple
 
 import numpy as np
-import statsmodels.api as sm
+from sklearn.linear_model import LogisticRegression
 
 from pull_scripts import pull_season
 from shared_types import *
@@ -48,17 +48,14 @@ def log_reg(year: Year) -> Tuple[LogRegType, Indexer]:
             X[i, ind_school.get(game.loser)] = 1
             y.append(0)
 
-    print(X)
-    print(X.shape)
-    print(y)
-    model = sm.Logit(y, X).fit()
+    model = LogisticRegression().fit(X, y)
     return model, ind_school
 
 
 def bt_featurizer(game: PlayoffGame) -> Dict[str, float]:
     model, ind_school = log_reg(game.year)
-    X = np.zeroes((1, len(ind_school)))
-    X[0, ind_school.get(game.team_1_school)] = 1
-    X[0, ind_school.get(game.team_2_school)] = -1
-    y = model.predict(X)
+    X = np.zeros((1, len(ind_school)))
+    X[0, ind_school.get(game.school_1)] = 1
+    X[0, ind_school.get(game.school_2)] = -1
+    y = model.predict_proba(X)[0, 0]
     return {"bt": y}
