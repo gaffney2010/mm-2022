@@ -34,22 +34,22 @@ def read_quadrant(html: str, year: Year, seeds_found) -> List[PlayoffGame]:
             break
 
         try:
-            school_a_seed = int(school_split[1].split("<span>")[1].split("</span>")[0])
-            school_b_seed = int(school_split[2].split("<span>")[1].split("</span>")[0])
+            school_1_seed = int(school_split[1].split("<span>")[1].split("</span>")[0])
+            school_2_seed = int(school_split[2].split("<span>")[1].split("</span>")[0])
         except:
             _, _, exc_traceback = sys.exc_info()
             logger.log_error(f"Malformed playoff game: {game}", exc_traceback, stop_program=False)
 
-        if school_a_seed + school_b_seed != 17:
+        if school_1_seed + school_2_seed != 17:
             # Not first round
             continue
 
-        seeds_found[school_a_seed] += 1
-        seeds_found[school_b_seed] += 1
+        seeds_found[school_1_seed] += 1
+        seeds_found[school_2_seed] += 1
 
-        school_a_won = school_split[0].find("winner") != -1
-        school_b_won = school_split[1].find("winner") != -1
-        if not (school_a_won ^ school_b_won):
+        school_1_won = school_split[0].find("winner") != -1
+        school_2_won = school_split[1].find("winner") != -1
+        if not (school_1_won ^ school_2_won):
             if hashlib.sha224(game.encode()).hexdigest() == "230081c2419c0304f6c4fa2ef6067b385ced1ea5f38968f1eeace101":
                 # Known exception: Oregon / VCU forfeit
                 continue
@@ -57,42 +57,35 @@ def read_quadrant(html: str, year: Year, seeds_found) -> List[PlayoffGame]:
             raise Exception
 
         try:
-            soup_a = BeautifulSoup(school_split[1], features="lxml")
-            link_a = soup_a.find("a")
-            school_a = link_a["href"].split("/")[3]
+            soup_1 = BeautifulSoup(school_split[1], features="lxml")
+            link_1 = soup_1.find("a")
+            school_1 = link_1["href"].split("/")[3]
         except:
             _, _, exc_traceback = sys.exc_info()
             logger.log_error(f"Malformed playoff game: {game}", exc_traceback, stop_program=False)
 
         try:
-            soup_b = BeautifulSoup(school_split[2], features="lxml")
-            link_b = soup_b.find("a")
-            school_b = link_b["href"].split("/")[3]
+            soup_2 = BeautifulSoup(school_split[2], features="lxml")
+            link_2 = soup_2.find("a")
+            school_2 = link_2["href"].split("/")[3]
         except:
             _, _, exc_traceback = sys.exc_info()
             logger.log_error(f"Malformed playoff game: {game}", exc_traceback, stop_program=False)
 
-        if random.random() < 0.5:
-            # Map a -> 1 and b -> 2
-            game = PlayoffGame(
-                year=year,
-                school_1=school_a,
-                school_1_seed=school_a_seed,
-                school_2=school_b,
-                school_2_seed=school_b_seed,
-                school_1_won=school_a_won,
-            )
+        game = PlayoffGame(
+            year=year,
+            school_1=school_1,
+            school_1_seed=school_1_seed,
+            school_2=school_2,
+            school_2_seed=school_2_seed,
+            school_1_won=school_1_won,
+        )
+        if random.random() > 0.5:
+            game = game.flip()
+            # TODO: Fix this nonsense
+            result.append(game)
         else:
-            # Map a -> 2 and b -> 1
-            game = PlayoffGame(
-                year=year,
-                school_1=school_b,
-                school_1_seed=school_b_seed,
-                school_2=school_a,
-                school_2_seed=school_a_seed,
-                school_1_won=school_b_won,
-            )
-        result.append(game)
+            result.append(game)
 
     return result
 
@@ -112,6 +105,6 @@ def read_playoffs(year: Year) -> List[PlayoffGame]:
 
     for k in range(1, 17):
         if k not in seeds_found or seeds_found[k] != 4:
-            logger.log_error(f"Missing playoff games, found these seeds: {seeds_found}", stop_program=True)
+            logger.log_error(f"Missing playoff games for year {year}, found these seeds: {seeds_found}", stop_program=True)
     
     return result

@@ -1,8 +1,17 @@
+################################################################################
+# Logging logic, must come first
+from tools.logger import configure_logging
+
 import logging
+configure_logging(screen=True, file=False, screen_level=logging.DEBUG, file_level=logging.WARNING)
+################################################################################
+
+import collections
 from typing import Dict, List
 
 import pandas as pd
 import statsmodels.api as sm
+from tabulate import tabulate
 
 import pull_round_1
 from shared_types import *
@@ -24,22 +33,67 @@ def train_model(featurizer: Featurizer, years: List[Year]) -> LogisticModel:
     return LogisticModel(featurizer=featurizer, model=model)
 
 
+def _infer_single_game(model: LogisticModel, game: PlayoffGame) -> float:
+    # Average P(win) and 1-P(loss) to smooth some models.
+    p = model.model.predict(pd.DataFrame(data=[model.featurizer(game)]))
+    q = model.model.predict(pd.DataFrame(data=[model.featurizer(game.flip())]))
+    return (p + 1 - q) / 2.0
+
+
 def _infer(model: LogisticModel, years: List[Year]) -> Dict[PlayoffGame, float]:
-    raise NotImplementedError
+    assert(len(years) > 0)
+
+    result = dict()
+    for year in years:
+        for game in pull_round_1.read_playoffs(year):
+            result[game] = _infer_single_game(model, game)
+    return result
 
 
+# TODO: This isn't actually cross entropy
 def _report_cross_entropy(history: Dict[PlayoffGame, float]) -> str:
-    raise NotImplementedError
+    num, den = 0, 0
+    for act, pred in history.items():
+        num += 1-pred if act.school_1_won else pred
+        den += 1
+    return f"Cross-entropy: {num/den}"
 
 
 def _report_calibration(history: Dict[PlayoffGame, float], bins: int = 5) -> str:
-    raise NotImplementedError
+    binning = collections.defaultdict(list)
+    for act, pred in history.items():
+        bin = int(pred * bins)
+        binning[bin].append((act, pred))
+    
+    df_rows = list()
+    for bin in range(bins):
+        games = binning[bin]
+        act_num, pred_num, den = 0, 0, 0
+        for act, pred in games:
+            act_num += 1 if act.school_1_won else 0
+            pred_num += pred
+            den += 1
+        row = {
+            "bin_num": bin,
+            "count": den,
+            "actual": "UNK" if den == 0 else act_num / den,
+            "predicted": "UNK" if den == 0 else pred_num / den,
+        }
+        df_rows.append(row)
+
+    df = pd.DataFrame(data=df_rows)
+    return tabulate(df, headers='keys')
 
 
 def score_and_report(model: LogisticModel, years: List[Year]) -> None:
     history = _infer(model, years)
-    logging.info(_report_cross_entropy(history))
-    logging.info(_report_calibration(history))
+    print(_report_cross_entropy(history))
+    print(_report_calibration(history))
+
+
+def fit_and_score_and_report(featurizer: Featurizer, fit_years: List[Year], score_years: List[Year]) -> None:
+    model = train_model(featurizer, fit_years)
+    score_and_report(model, score_years)
 
 
 # Seed model
@@ -50,4 +104,8 @@ def seed_featurizer(game: PlayoffGame) -> Dict[str, float]:
     }
 
 
-print(train_model(seed_featurizer, [2021] + list(range(2019, 1984, -1))).model.summary())
+fit_and_score_and_report(
+    seed_featurizer,
+    fit_years=list(range(2017, 1985, -1)),
+    score_years=[2021, 2019, 2018],
+)

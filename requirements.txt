@@ -5,4 +5,5 @@ pandas
 retrying
 selenium
 statsmodels
+tabulate
 traceback

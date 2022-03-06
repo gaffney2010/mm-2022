@@ -24,6 +24,16 @@ class PlayoffGame(object):
     school_2_seed: int = attr.ib()
     school_1_won: bool = attr.ib()
 
+    def flip(self) -> 'PlayoffGame':
+        return PlayoffGame(
+            year=self.year,
+            school_1=self.school_2,
+            school_1_seed=self.school_2_seed,
+            school_2=self.school_1,
+            school_2_seed=self.school_1_seed,
+            school_1_won=not self.school_1_won,
+        )
+
 
 Featurizer = Callable[[PlayoffGame], Dict[str, float]]
 
