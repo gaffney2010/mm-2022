@@ -2,7 +2,7 @@ import collections
 from typing import Dict, List
 
 import pandas as pd
-import statsmodels.api as sm
+from sklearn.linear_model import LogisticRegression
 from tabulate import tabulate
 
 from pull_scripts import pull_round_1
@@ -20,7 +20,7 @@ def train_model(featurizer: Featurizer, years: List[Year]) -> LogisticModel:
             y.append(1 if game.school_1_won else 0)
     X = pd.DataFrame(data=X_rows)
 
-    model = sm.Logit(y, X).fit()
+    model = LogisticRegression(X, y).fit()
 
     return LogisticModel(featurizer=featurizer, model=model)
 

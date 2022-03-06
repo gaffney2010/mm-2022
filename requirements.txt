@@ -6,6 +6,5 @@ pandas
 retrying
 selenium
 sklearn
-statsmodels
 tabulate
 traceback
