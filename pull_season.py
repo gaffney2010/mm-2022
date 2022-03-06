@@ -11,27 +11,17 @@ import functools
 import sys
 from typing import Dict, List, Set
 
-import attr
 from bs4 import BeautifulSoup
 import dateutil
 import pandas as pd
 
 from tools import logger, scraper_tools
+from shared_types import *
 
 
 # TODO: Rename these.
 FULL_YEAR = "https://www.sports-reference.com/cbb/seasons/{}-school-stats.html"
 SCHEDULE = "https://www.sports-reference.com/cbb/schools/{}/{}-schedule.html"
-
-School = str
-Year = int
-
-
-@attr.s(frozen=True)
-class Game(object):
-    winner: School = attr.ib()
-    loser: School = attr.ib()
-    date: datetime = attr.ib()
 
 
 logging.debug("HELLO")

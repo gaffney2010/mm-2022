@@ -12,27 +12,13 @@ import random
 import sys
 from typing import List
 
-import attr
 from bs4 import BeautifulSoup
 
 from tools import logger, scraper_tools
+from shared_types import *
 
 
 POST_SEASON = "https://www.sports-reference.com/cbb/postseason/{}-ncaa.html"
-
-# TODO: Share types
-School = str
-Year = int
-
-
-@attr.s(frozen=True)
-class PlayoffGame(object):
-    year: Year = attr.ib()
-    school_1: School = attr.ib()
-    school_1_seed: int = attr.ib()
-    school_2: School = attr.ib()
-    school_2_seed: int = attr.ib()
-    school_1_won: bool = attr.ib()
 
 
 def read_quadrant(html: str, seeds_found) -> List[PlayoffGame]:
