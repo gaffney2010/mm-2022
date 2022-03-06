@@ -56,7 +56,6 @@ def read_quadrant(html: str, seeds_found) -> List[PlayoffGame]:
         if school_a_seed + school_b_seed != 17:
             # Not first round
             continue
-            # Note:  This can theoretically error in the final four, but has probably never happened.
 
         seeds_found[school_a_seed] += 1
         seeds_found[school_b_seed] += 1
