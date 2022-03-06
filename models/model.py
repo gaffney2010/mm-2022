@@ -1,11 +1,3 @@
-################################################################################
-# Logging logic, must come first
-from tools.logger import configure_logging
-
-import logging
-configure_logging(screen=True, file=False, screen_level=logging.DEBUG, file_level=logging.WARNING)
-################################################################################
-
 import collections
 from typing import Dict, List
 
