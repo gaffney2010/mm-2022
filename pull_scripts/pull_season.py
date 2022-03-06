@@ -1,13 +1,5 @@
-################################################################################
-# Logging logic, must come first
-from tools.logger import configure_logging
-
-import logging
-configure_logging(screen=False, file=True, screen_level=logging.DEBUG, file_level=logging.WARNING)
-################################################################################
-
-from datetime import datetime
 import functools
+import logging
 import sys
 from typing import Dict, List, Set
 
@@ -22,9 +14,6 @@ from shared_types import *
 # TODO: Rename these.
 FULL_YEAR = "https://www.sports-reference.com/cbb/seasons/{}-school-stats.html"
 SCHEDULE = "https://www.sports-reference.com/cbb/schools/{}/{}-schedule.html"
-
-
-logging.debug("HELLO")
 
 
 @functools.lru_cache(100)
@@ -103,10 +92,3 @@ def scrape_season(year: Year) -> Set[Game]:
             all_games.add(game)
 
     return all_games
-
-
-for year in range(2019, 2014, -1):
-    logging.warning(logger.log_section(f"New run for {year}"))
-    _ = scrape_season(year)
-
-logging.debug("GOODBYE")

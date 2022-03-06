@@ -13,7 +13,7 @@ import pandas as pd
 import statsmodels.api as sm
 from tabulate import tabulate
 
-import pull_round_1
+from pull_scripts import pull_round_1
 from shared_types import *
 
 
@@ -94,18 +94,3 @@ def score_and_report(model: LogisticModel, years: List[Year]) -> None:
 def fit_and_score_and_report(featurizer: Featurizer, fit_years: List[Year], score_years: List[Year]) -> None:
     model = train_model(featurizer, fit_years)
     score_and_report(model, score_years)
-
-
-# Seed model
-def seed_featurizer(game: PlayoffGame) -> Dict[str, float]:
-    return {
-        f"{i}_seed": 1 if game.school_1_seed == i else 0
-        for i in range(1, 17)
-    }
-
-
-fit_and_score_and_report(
-    seed_featurizer,
-    fit_years=list(range(2017, 1985, -1)),
-    score_years=[2021, 2019, 2018],
-)
