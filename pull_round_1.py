@@ -27,6 +27,7 @@ Year = int
 
 @attr.s(frozen=True)
 class PlayoffGame(object):
+    year: Year = attr.ib()
     school_1: School = attr.ib()
     school_1_seed: int = attr.ib()
     school_2: School = attr.ib()
@@ -88,6 +89,7 @@ def read_quadrant(html: str, seeds_found) -> List[PlayoffGame]:
         if random.random() < 0.5:
             # Map a -> 1 and b -> 2
             game = PlayoffGame(
+                year=year,
                 school_1=school_a,
                 school_1_seed=school_a_seed,
                 school_2=school_b,
@@ -97,6 +99,7 @@ def read_quadrant(html: str, seeds_found) -> List[PlayoffGame]:
         else:
             # Map a -> 2 and b -> 1
             game = PlayoffGame(
+                year=year,
                 school_1=school_b,
                 school_1_seed=school_b_seed,
                 school_2=school_a,
