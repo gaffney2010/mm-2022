@@ -57,5 +57,5 @@ def bt_featurizer(game: PlayoffGame) -> Dict[str, float]:
     X = np.zeros((1, len(ind_school)))
     X[0, ind_school.get(game.school_1)] = 1
     X[0, ind_school.get(game.school_2)] = -1
-    y = model.predict_proba(X)[0, 0]
+    y = model.predict_proba(X)[0, 1]
     return {"bt": y}

@@ -27,8 +27,8 @@ def train_model(featurizer: Featurizer, years: List[Year]) -> LogisticModel:
 
 def _infer_single_game(model: LogisticModel, game: PlayoffGame) -> float:
     # Average P(win) and 1-P(loss) to smooth some models.
-    p = model.model.predict_proba(pd.DataFrame(data=[model.featurizer(game)]))[0, 0]
-    q = model.model.predict_proba(pd.DataFrame(data=[model.featurizer(game.flip())]))[0, 0]
+    p = model.model.predict_proba(pd.DataFrame(data=[model.featurizer(game)]))[0, 1]
+    q = model.model.predict_proba(pd.DataFrame(data=[model.featurizer(game.flip())]))[0, 1]
     return (p + 1 - q) / 2.0
 
 
