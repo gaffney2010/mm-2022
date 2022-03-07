@@ -1,6 +1,7 @@
 attrs
 beautifulsoup4
 lxml
+networkx
 numpy
 pandas
 retrying
