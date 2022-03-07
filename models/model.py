@@ -1,4 +1,5 @@
 import collections
+import math
 from typing import Dict, List
 
 import pandas as pd
@@ -8,11 +9,10 @@ from pull_scripts import pull_round_1
 from shared_types import *
 
 
-# TODO: This isn't actually cross entropy
 def _report_cross_entropy(history: Dict[PlayoffGame, float]) -> str:
     num, den = 0, 0
     for act, pred in history.items():
-        num += 1 - pred if act.school_1_won else pred
+        num -= math.log(1 - pred, 2) if act.school_1_won else math.log(pred, 2)
         den += 1
     return f"Cross-entropy: {num/den}"
 
