@@ -12,14 +12,9 @@ configure_logging(
 from models import bradley_terry, model, seed
 
 
-model.fit_and_score_and_report(
-    seed.seed_featurizer,
-    fit_years=list(range(2017, 1985, -1)),
-    score_years=[2021, 2019, 2018],
-)
+# seed_model = seed.train_model(list(range(2017, 1985, -1)))
+# history = seed.infer(seed_model, [2021, 2019, 2018])
+# print(model.report(history))
 
-# model.fit_and_score_and_report(
-#     bradley_terry.bt_featurizer,
-#     fit_years=[2019],
-#     score_years=[2021],
-# )
+
+print(model.report(bradley_terry.history([2019, 2021])))

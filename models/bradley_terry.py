@@ -1,11 +1,11 @@
 import functools
 import random
-from typing import Dict, Tuple
+from typing import Dict, List, Tuple
 
 import numpy as np
 from sklearn.linear_model import LogisticRegression
 
-from pull_scripts import pull_season
+from pull_scripts import pull_season, pull_round_1
 from shared_types import *
 
 
@@ -52,10 +52,18 @@ def log_reg(year: Year) -> Tuple[LogRegType, Indexer]:
     return model, ind_school
 
 
-def bt_featurizer(game: PlayoffGame) -> Dict[str, float]:
+def bt(game: PlayoffGame) -> float:
     model, ind_school = log_reg(game.year)
     X = np.zeros((1, len(ind_school)))
     X[0, ind_school.get(game.school_1)] = 1
     X[0, ind_school.get(game.school_2)] = -1
     y = model.predict_proba(X)[0, 1]
-    return {"bt": y}
+    return y
+
+
+def history(years: List[Year]) -> Dict[PlayoffGame, float]:
+    result = dict()
+    for year in years:
+        for game in pull_round_1.read_playoffs(year):
+            result[game] = bt(game)
+    return result

@@ -92,6 +92,7 @@ def read_quadrant(html: str, year: Year, seeds_found) -> List[PlayoffGame]:
     return result
 
 
+# TODO: More consistent naming
 @functools.lru_cache(100)
 def read_playoffs(year: Year) -> List[PlayoffGame]:
     random.seed(year)
