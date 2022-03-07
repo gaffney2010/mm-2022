@@ -37,7 +37,7 @@ def pr_ranks(year: Year) -> Dict[School, float]:
 # Returns scatter plot of page-rank diffence by win/loss
 @functools.lru_cache(100)
 def experience(year: Year) -> List[Tuple[float, float]]:
-    pr = page_ranks(year)
+    pr = pr_ranks(year)
 
     unsorted = list()
     for game in pull_season.scrape_season(year):
@@ -52,26 +52,20 @@ def weight(x: float, y: float, bandwidth: float) -> float:
     a = abs(x - y)
     if a > bandwidth:
         return 0
-    return a / bandwidth
+    return 1 - a / bandwidth
 
 
-BANDWIDTH = 0.002
+BANDWIDTH = 100
 def infer(game: PlayoffGame) -> float:
-    pr = page_ranks(game.year)
+    pr = pr_ranks(game.year)
     diff = pr[game.school_1] - pr[game.school_2]
 
-    num, den, ct = 0, 0, 0
+    num, den = 0, 0
     bandwidth = BANDWIDTH
-    while ct < 20:  # Sufficient data
-        num, den, ct = 0, 0, 0
-        for x, y in experience(game.year):
-            w = weight(diff, x, bandwidth)
-            num += w*y
-            den += w
-            ct += 1
-
-        # May need to try again for some weird edge cases.
-        bandwidth *= 2
+    for x, y in experience(game.year):
+        w = weight(diff, x, bandwidth)
+        num += w*y
+        den += w
 
     result = num / den
     if result > 0.95:
