@@ -1,5 +1,6 @@
 ################################################################################
 # Logging logic, must come first
+from models.page_rank import page_ranks
 from tools.logger import configure_logging
 
 import logging
@@ -9,15 +10,25 @@ configure_logging(
 )
 ################################################################################
 
-from models import bradley_terry, model, random_bench, seed
+from models import bradley_terry, model, page_rank, random_bench, seed
 
-
-# seed_model = seed.train_model(list(range(2017, 1985, -1)))
-# history = seed.infer(seed_model, [2021, 2019, 2018])
-# print(model.report(history))
-
-
-# print(model.report(bradley_terry.history([2019, 2021])))
-
-
+print("")
+print("RANDOM BENCHMARK")
 print(model.report(random_bench.history([2019, 2021])))
+
+
+print("")
+print("SEED MODEL")
+seed_model = seed.train_model(list(range(2017, 1985, -1)))
+history = seed.infer(seed_model, [2021, 2019, 2018])
+print(model.report(history))
+
+
+print("")
+print("BRADLEY-TERRY")
+print(model.report(bradley_terry.history([2019, 2021])))
+
+
+print("")
+print("PAGE RANK LOESS")
+print(model.report(page_rank.history([2019, 2021])))
