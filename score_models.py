@@ -9,7 +9,7 @@ configure_logging(
 )
 ################################################################################
 
-from models import bradley_terry, model, random, seed
+from models import bradley_terry, model, random_bench, seed
 
 
 # seed_model = seed.train_model(list(range(2017, 1985, -1)))
@@ -20,4 +20,4 @@ from models import bradley_terry, model, random, seed
 # print(model.report(bradley_terry.history([2019, 2021])))
 
 
-print(model.report(random.history([2019, 2021])))
+print(model.report(random_bench.history([2019, 2021])))
