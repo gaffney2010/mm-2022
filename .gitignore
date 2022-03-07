@@ -134,3 +134,6 @@ computer_constants.py
 # Don't need copies of this
 data/*.data
 logging/*.log
+
+# Little outputs
+*.csv

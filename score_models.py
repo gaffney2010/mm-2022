@@ -1,8 +1,6 @@
 ################################################################################
 # Logging logic, must come first
-from models.page_rank import page_ranks
 from tools.logger import configure_logging
-
 import logging
 
 configure_logging(

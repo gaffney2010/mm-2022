@@ -25,6 +25,15 @@ def page_ranks(year: Year) -> Dict[School, float]:
     return pr
 
 
+@functools.lru_cache(100)
+def pr_ranks(year: Year) -> Dict[School, float]:
+    pr = page_ranks(year)
+    pr = sorted([(-v, k) for k, v in pr.items()])
+    pr = {xi[1]: i+1 for i, xi in enumerate(pr)}
+    return pr
+
+
+# TODO: Use multiple years of experience
 # Returns scatter plot of page-rank diffence by win/loss
 @functools.lru_cache(100)
 def experience(year: Year) -> List[Tuple[float, float]]:
