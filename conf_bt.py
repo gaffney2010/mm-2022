@@ -1,5 +1,6 @@
 ################################################################################
 # Logging logic, must come first
+from constants import DATA_DIR
 from tools.logger import configure_logging
 import logging
 
@@ -9,6 +10,8 @@ configure_logging(
 ################################################################################
 
 # This emulates the code in bradley_terry.py
+import json
+import os
 import random
 from typing import Iterator
 
@@ -73,5 +76,22 @@ def conf_bt_season(year: Year) -> Dict[School, float]:
     return result
 
 
+def cached_conf_bt_season(year: Year, version: str) -> Dict[School, float]:
+    # Version for easy cache invalidation - kinda hack.
+    cache_key = f"cached_conf_bt_season.{version}.{year}.json.data"
+    path = os.path.join(DATA_DIR, cache_key)
+
+    if os.path.exists(path):
+        with open(path, "r") as f:
+            json_str = f.read()
+        return json.loads(json_str)
+
+    result = conf_bt_season(year)
+    with open(path, "w") as f:
+        f.write(json.dumps(result))
+    return result
+
+
 year = 2021
-print(conf_bt_season(year))
+version = "test"
+print(cached_conf_bt_season(year, version))
