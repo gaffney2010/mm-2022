@@ -36,15 +36,15 @@ def pr_ranks(year: Year) -> Dict[School, float]:
 # TODO: Use multiple years of experience
 # Returns scatter plot of page-rank diffence by win/loss
 @functools.lru_cache(100)
-def experience(year: Year) -> List[Tuple[float, float]]:
-    pr = pr_ranks(year)
+def experience(years: Tuple[Year]) -> List[Tuple[float, float]]:
+    result = list()
+    for year in years:
+        pr = pr_ranks(year)
+        for game in pull_season.scrape_season(year):
+            result.append((pr[game.winner]-pr[game.loser], 1.0))
+            result.append((pr[game.loser]-pr[game.winner], 0.0))
 
-    unsorted = list()
-    for game in pull_season.scrape_season(year):
-        unsorted.append((pr[game.winner]-pr[game.loser], 1.0))
-        unsorted.append((pr[game.loser]-pr[game.winner], 0.0))
-
-    return sorted(unsorted)
+    return sorted(result)
 
 
 # For smoothing
@@ -55,14 +55,14 @@ def weight(x: float, y: float, bandwidth: float) -> float:
     return 1 - a / bandwidth
 
 
-BANDWIDTH = 100
-def infer(game: PlayoffGame) -> float:
+BANDWIDTH = 50
+def infer(game: PlayoffGame, loess_years: Tuple[Year]) -> float:
     pr = pr_ranks(game.year)
     diff = pr[game.school_1] - pr[game.school_2]
 
     num, den = 0, 0
     bandwidth = BANDWIDTH
-    for x, y in experience(game.year):
+    for x, y in experience(loess_years):
         w = weight(diff, x, bandwidth)
         num += w*y
         den += w
@@ -75,9 +75,9 @@ def infer(game: PlayoffGame) -> float:
     return result
 
 
-def history(years: List[Year]) -> Dict[PlayoffGame, float]:
+def history(years: List[Year], loess_years: Tuple[Year]) -> Dict[PlayoffGame, float]:
     result = dict()
     for year in years:
         for game in pull_round_1.read_playoffs(year):
-            result[game] = infer(game)
+            result[game] = infer(game, loess_years)
     return result

@@ -29,4 +29,5 @@ from models import bradley_terry, model, page_rank, random_bench, seed
 
 print("")
 print("PAGE RANK LOESS")
-print(model.report(page_rank.history([2019, 2021])))
+loess_years = (2017, 2018, 2019, 2020, 2021)
+print(model.report(page_rank.history([2018, 2019, 2021], loess_years=loess_years)))
