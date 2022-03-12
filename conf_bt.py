@@ -17,6 +17,7 @@ from typing import Iterator
 
 import attr
 import numpy as np
+import pandas as pd
 from sklearn.linear_model import LogisticRegression
 
 from models import bradley_terry
@@ -92,6 +93,16 @@ def cached_conf_bt_season(year: Year, version: str) -> Dict[School, float]:
     return result
 
 
-year = 2021
-version = "test"
-print(cached_conf_bt_season(year, version))
+version = "1"
+data = list()
+for year in range(1990, 2023):
+    for school, coef in cached_conf_bt_season(year, version).items():
+        datum = {
+            "year": year,
+            "school": school,
+            "coef": coef,
+        }
+        data.append(datum)
+
+df = pd.DataFrame(data)
+df.to_csv(f"conf_trend.csv")
