@@ -26,8 +26,8 @@ def row_from_game(game: PlayoffGame) -> Dict[str, Any]:
         "seed": game.school_1_seed,
         "seed_prob": seed._infer_single_game(seed_model, game),
         "bt": bradley_terry.bt(game),
-        "pr": page_rank.page_ranks(game.year)[game.school_1],
-        "pr_rank": page_rank.pr_ranks(game.year)[game.school_1],
+        # "pr": page_rank.page_ranks(game.year)[game.school_1],
+        "pr": page_rank.pr_ranks(game.year)[game.school_1],
         "pr_prob": page_rank.infer(game),
         "won": game.school_1_won
     }
