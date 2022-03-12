@@ -44,7 +44,9 @@ def _report_calibration(history: Dict[PlayoffGame, float], bins: int = 5) -> str
 
 
 def report(history: Dict[PlayoffGame, float]) -> str:
-    return "\n".join([
-        _report_cross_entropy(history),
-        _report_calibration(history),
-    ])
+    return "\n".join(
+        [
+            _report_cross_entropy(history),
+            _report_calibration(history),
+        ]
+    )

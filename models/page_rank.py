@@ -29,7 +29,7 @@ def page_ranks(year: Year) -> Dict[School, float]:
 def pr_ranks(year: Year) -> Dict[School, float]:
     pr = page_ranks(year)
     pr = sorted([(-v, k) for k, v in pr.items()])
-    pr = {xi[1]: i+1 for i, xi in enumerate(pr)}
+    pr = {xi[1]: i + 1 for i, xi in enumerate(pr)}
     return pr
 
 
@@ -41,8 +41,8 @@ def experience(years: Tuple[Year]) -> List[Tuple[float, float]]:
     for year in years:
         pr = pr_ranks(year)
         for game in pull_season.scrape_season(year):
-            result.append((pr[game.winner]-pr[game.loser], 1.0))
-            result.append((pr[game.loser]-pr[game.winner], 0.0))
+            result.append((pr[game.winner] - pr[game.loser], 1.0))
+            result.append((pr[game.loser] - pr[game.winner], 0.0))
 
     return sorted(result)
 
@@ -56,6 +56,8 @@ def weight(x: float, y: float, bandwidth: float) -> float:
 
 
 BANDWIDTH = 50
+
+
 def infer(game: PlayoffGame, loess_years: Tuple[Year]) -> float:
     pr = pr_ranks(game.year)
     diff = pr[game.school_1] - pr[game.school_2]
@@ -64,7 +66,7 @@ def infer(game: PlayoffGame, loess_years: Tuple[Year]) -> float:
     bandwidth = BANDWIDTH
     for x, y in experience(loess_years):
         w = weight(diff, x, bandwidth)
-        num += w*y
+        num += w * y
         den += w
 
     result = num / den

@@ -35,7 +35,9 @@ def _school_field(raw: str) -> School:
     return raw.split("\xa0")[0]
 
 
-def _open_school_page(school: School, year: Year, required_fields: List[str]) -> Optional[pd.DataFrame]:
+def _open_school_page(
+    school: School, year: Year, required_fields: List[str]
+) -> Optional[pd.DataFrame]:
     """Will report any errors for you, and return None"""
     try:
         html = scraper_tools.read_url_to_string(SCHEDULE.format(school, year))

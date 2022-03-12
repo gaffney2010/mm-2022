@@ -19,6 +19,7 @@ from shared_types import PlayoffGame
 
 seed_model = seed.train_model(list(range(1985, 2020)) + [2021])
 
+
 def row_from_game(game: PlayoffGame) -> Dict[str, Any]:
     return {
         "school": game.school_1,
@@ -29,8 +30,9 @@ def row_from_game(game: PlayoffGame) -> Dict[str, Any]:
         # "pr": page_rank.page_ranks(game.year)[game.school_1],
         "pr": page_rank.pr_ranks(game.year)[game.school_1],
         "pr_prob": page_rank.infer(game),
-        "won": game.school_1_won
+        "won": game.school_1_won,
     }
+
 
 year = 2021
 
