@@ -31,11 +31,16 @@ def get_schools(year: Year) -> Dict[str, School]:
     return schools
 
 
-def get_reg_season_school(school: School, year: Year) -> List[Game]:
+def _school_field(raw: str) -> School:
+    return raw.split("\xa0")[0]
+
+
+def _open_school_page(school: School, year: Year, required_fields: List[str]) -> Optional[pd.DataFrame]:
+    """Will report any errors for you, and return None"""
     try:
         html = scraper_tools.read_url_to_string(SCHEDULE.format(school, year))
         df = pd.read_html(html)[-1]
-        for req in ("Type", "Opponent", "Unnamed: 7", "Date"):
+        for req in required_fields:
             if req not in df.columns:
                 raise Exception("Bad df")
     except:
@@ -46,6 +51,27 @@ def get_reg_season_school(school: School, year: Year) -> List[Game]:
             exc_traceback,
             stop_program=False,
         )
+        return None
+    return df[required_fields]
+
+
+def get_conf_from_school_page(school: School, year: Year) -> Dict[School, Conf]:
+    df = _open_school_page(school, year, ["Opponent", "Conf"])
+    if df is None:
+        return {}
+
+    result = dict()
+    for _, row in df.iterrows():
+        if row["Conf"] == "" or row["Conf"] != row["Conf"]:
+            continue
+        result[_school_field(row["Opponent"])] = row["Conf"]
+
+    return result
+
+
+def get_reg_season_school(school: School, year: Year) -> List[Game]:
+    df = _open_school_page(school, year, ["Type", "Opponent", "Unnamed: 7", "Date"])
+    if df is None:
         return []
 
     all_games = list()
@@ -56,13 +82,13 @@ def get_reg_season_school(school: School, year: Year) -> List[Game]:
         count_games += 1
 
         try:
-            opponent = get_schools(year)[row["Opponent"].split("\xa0")[0]]
+            opponent = get_schools(year)[_school_field(row["Opponent"])]
         except:
             logger.log_error(
                 f"Couldn't find key for school {row['Opponent']} found on school {school}, continuing with non_key",
                 stop_program=False,
             )
-            opponent = row["Opponent"].split("\xa0")[0].replace(" ", "-").upper()
+            opponent = _school_field(row["Opponent"]).replace(" ", "-").upper()
 
         outcome = row["Unnamed: 7"]
         if outcome == "W":
@@ -90,13 +116,24 @@ def get_reg_season_school(school: School, year: Year) -> List[Game]:
     return all_games
 
 
+@functools.lru_cache(100)
+def get_conf(year: Year) -> Dict[School, Conf]:
+    school_dict = get_schools(year)
+
+    result = dict()
+    for _, school in school_dict.items():
+        logging.debug(logger.log_section(_))
+        result.update(get_conf_from_school_page(school, year))
+
+    return result
+
+
 def scrape_season(year: Year) -> Set[Game]:
     school_dict = get_schools(year)
 
     all_games = set()
     for _, school in school_dict.items():
         logging.debug(logger.log_section(_))
-        logging.debug(_)
         for game in get_reg_season_school(school, year):
             all_games.add(game)
 

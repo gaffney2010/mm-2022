@@ -1,10 +1,11 @@
 from datetime import datetime
-from typing import Any, Callable, Dict
+from typing import Any, Callable, Dict, Optional
 
 import attr
 
 
 School = str
+Conf = Optional[str]
 Year = int
 # TODO: Replace type with sm.discrete.discrete_model.Logit
 LogRegType = Any
