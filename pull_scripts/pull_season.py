@@ -64,7 +64,17 @@ def get_conf_from_school_page(school: School, year: Year) -> Dict[School, Conf]:
     for _, row in df.iterrows():
         if row["Conf"] == "" or row["Conf"] != row["Conf"]:
             continue
-        result[_school_field(row["Opponent"])] = row["Conf"]
+
+        # TODO: Clean this up a little to share code maybe.
+        try:
+            opponent = get_schools(year)[_school_field(row["Opponent"])]
+        except:
+            logger.log_error(
+                f"Couldn't find key for school {row['Opponent']} found on school {school}, continuing with non_key",
+                stop_program=False,
+            )
+            continue
+        result[opponent] = row["Conf"]
 
     return result
 
@@ -128,6 +138,7 @@ def get_conf(year: Year) -> Dict[School, Conf]:
     return result
 
 
+@functools.lru_cache(100)
 def scrape_season(year: Year) -> Set[Game]:
     school_dict = get_schools(year)
 

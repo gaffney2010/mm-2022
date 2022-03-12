@@ -30,11 +30,10 @@ class Indexer(object):
 @functools.lru_cache(100)
 def log_reg(year: Year) -> Tuple[LogRegType, Indexer]:
     ind_school = Indexer()
-    num_data_pts = 0
     for game in pull_season.scrape_season(year):
         ind_school.push(game.winner)
         ind_school.push(game.loser)
-        num_data_pts += 1
+    num_data_pts = len(pull_season.scrape_season(year))
     
     X, y = np.zeros((num_data_pts, len(ind_school))), list()
     for i, game in enumerate(pull_season.scrape_season(year)):
