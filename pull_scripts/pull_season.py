@@ -6,6 +6,7 @@ from typing import Dict, List, Set
 from bs4 import BeautifulSoup
 import dateutil
 import pandas as pd
+from tqdm import tqdm
 
 from tools import logger, scraper_tools
 from shared_types import *
@@ -44,7 +45,9 @@ def _open_school_page(
         df = pd.read_html(html)[-1]
         for req in required_fields:
             if req not in df.columns:
-                raise Exception("Bad df")
+                logging.debug(f"Available columns: {df.columns}")
+                logging.error(f"Bad df - no {req} column")
+                raise Exception(f"Bad df - no {req} column")
     except:
         # TODO: Check for a link on that cell.
         _, _, exc_traceback = sys.exc_info()
@@ -57,6 +60,14 @@ def _open_school_page(
     return df[required_fields]
 
 
+def has_columns(row: Dict[str, Any], cols: List[str]) -> bool:
+    for col in cols:
+        cell = row[col]
+        if cell == "" or cell != cell or cell is None:
+            return False
+    return True
+
+
 def get_conf_from_school_page(school: School, year: Year) -> Dict[School, Conf]:
     df = _open_school_page(school, year, ["Opponent", "Conf"])
     if df is None:
@@ -64,7 +75,7 @@ def get_conf_from_school_page(school: School, year: Year) -> Dict[School, Conf]:
 
     result = dict()
     for _, row in df.iterrows():
-        if row["Conf"] == "" or row["Conf"] != row["Conf"]:
+        if not has_columns(row, ["Conf", "Opponent"]):
             continue
 
         # TODO: Clean this up a little to share code maybe.
@@ -82,15 +93,21 @@ def get_conf_from_school_page(school: School, year: Year) -> Dict[School, Conf]:
 
 
 def get_reg_season_school(school: School, year: Year) -> List[Game]:
-    df = _open_school_page(school, year, ["Type", "Opponent", "Unnamed: 7", "Date"])
+    outcome_col = "Unnamed: 6" if year <= 2014 else "Unnamed: 7"
+    df = _open_school_page(school, year, ["Type", "Opponent", outcome_col, "Date"])
     if df is None:
         return []
 
     all_games = list()
     count_games = 0
     for _, row in df.iterrows():
+        if not has_columns(row, ["Opponent"]):
+            # One-time data error:  https://www.sports-reference.com/cbb/schools/buffalo/1994-schedule.html
+            continue
+
         if row["Type"] != "REG":
             continue
+
         count_games += 1
 
         try:
@@ -102,7 +119,7 @@ def get_reg_season_school(school: School, year: Year) -> List[Game]:
             )
             opponent = _school_field(row["Opponent"]).replace(" ", "-").upper()
 
-        outcome = row["Unnamed: 7"]
+        outcome = row[outcome_col]
         if outcome == "W":
             winner, loser = school, opponent
         elif outcome == "L":
@@ -133,7 +150,7 @@ def get_conf(year: Year) -> Dict[School, Conf]:
     school_dict = get_schools(year)
 
     result = dict()
-    for _, school in school_dict.items():
+    for _, school in tqdm(school_dict.items()):
         logging.debug(logger.log_section(_))
         result.update(get_conf_from_school_page(school, year))
 

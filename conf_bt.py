@@ -50,6 +50,7 @@ def conference_matches(year: Year) -> Iterator[Conf]:
 def conf_bt_season(year: Year) -> Dict[School, float]:
     # Need this as a list actually:
     matches = list(conference_matches(year))
+    # print(matches)
 
     ind_conf = bradley_terry.Indexer()
     for match in matches:
@@ -95,7 +96,8 @@ def cached_conf_bt_season(year: Year, version: str) -> Dict[School, float]:
 
 version = "1"
 data = list()
-for year in range(1990, 2023):
+for year in range(1993, 2023):
+    print(year)
     for school, coef in cached_conf_bt_season(year, version).items():
         datum = {
             "year": year,

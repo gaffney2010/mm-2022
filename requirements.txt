@@ -8,4 +8,5 @@ retrying
 selenium
 sklearn
 tabulate
+tqdm
 traceback
