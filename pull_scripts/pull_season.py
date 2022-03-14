@@ -82,8 +82,9 @@ def get_conf_from_school_page(school: School, year: Year) -> Dict[School, Conf]:
         try:
             opponent = get_schools(year)[_school_field(row["Opponent"])]
         except:
+            opponent = row["Opponent"]
             logger.log_error(
-                f"Couldn't find key for school {row['Opponent']} found on school {school}, continuing with non_key",
+                f"Couldn't find key for school {opponent} found on school {school}, continuing with non_key",
                 stop_program=False,
             )
             continue
