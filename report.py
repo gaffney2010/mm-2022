@@ -29,6 +29,7 @@ def row_from_game(game: PlayoffGame) -> Dict[str, Any]:
         "bt": bradley_terry.bt(game),
         # "pr": page_rank.page_ranks(game.year)[game.school_1],
         "pr": page_rank.pr_ranks(game.year)[game.school_1],
+        # TODO: Update with loess_years
         "pr_prob": page_rank.infer(game),
         "won": game.school_1_won,
     }
