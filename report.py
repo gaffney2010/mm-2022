@@ -15,6 +15,7 @@ import pandas as pd
 from models import bradley_terry, page_rank, seed
 from pull_scripts import pull_round_1
 from shared_types import PlayoffGame
+from tools import file
 
 
 seed_model = seed.train_model(list(range(1985, 2020)) + [2021])
@@ -43,5 +44,4 @@ for game in pull_round_1.read_playoffs(year):
     data.append(row_from_game(game.flip()))
 
 df = pd.DataFrame(data)
-
-df.to_csv(f"{year}.csv")
+file.write_csv(df, year)

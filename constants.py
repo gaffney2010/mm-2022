@@ -7,4 +7,5 @@ import os
 from computer_constants import TOP_LEVEL_DIR
 
 DATA_DIR = os.path.join(TOP_LEVEL_DIR, "data")
+CSV_DIR = os.path.join(DATA_DIR, "csv")
 LOGGING_DIR = os.path.join(TOP_LEVEL_DIR, "logging")

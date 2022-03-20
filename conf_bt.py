@@ -23,6 +23,7 @@ from sklearn.linear_model import LogisticRegression
 from models import bradley_terry
 from pull_scripts import pull_season
 from shared_types import *
+from tools import file
 
 
 @attr.s(frozen=True)
@@ -107,4 +108,4 @@ for year in range(1993, 2023):
         data.append(datum)
 
 df = pd.DataFrame(data)
-df.to_csv(f"conf_trend.csv")
+file.write_csv(df, "conf_trend")

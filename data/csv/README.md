@@ -1,0 +1,1 @@
+A folder for reading and writing to externally managed spreadsheets.

@@ -135,5 +135,5 @@ computer_constants.py
 data/*.data
 logging/*.log
 
-# Little outputs
-*.csv
+# Don't save this stuff
+data/csv/*.csv
