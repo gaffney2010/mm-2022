@@ -131,8 +131,9 @@ dmypy.json
 # Specific to this machine
 computer_constants.py
 
-# Don't need copies of this
+# Don't need copies of this - big data
 data/*.data
+data/*/*.data
 logging/*.log
 
 # Don't save this stuff

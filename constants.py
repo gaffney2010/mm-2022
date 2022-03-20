@@ -6,6 +6,7 @@ import os
 #  houses this file.
 from computer_constants import TOP_LEVEL_DIR
 
-DATA_DIR = os.path.join(TOP_LEVEL_DIR, "data")
-CSV_DIR = os.path.join(DATA_DIR, "csv")
+BASE_DATA_DIR = os.path.join(TOP_LEVEL_DIR, "data")
+DATA_DIR = os.path.join(BASE_DATA_DIR, "caches")
+CSV_DIR = os.path.join(BASE_DATA_DIR, "csv")
 LOGGING_DIR = os.path.join(TOP_LEVEL_DIR, "logging")
