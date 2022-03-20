@@ -1,4 +1,4 @@
-"""This file helps tune the unit bet size."""
+"""This file helps tune the unit bet size, to manage probability of bankrupcy."""
 
 import random
 
