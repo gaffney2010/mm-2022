@@ -28,7 +28,7 @@ for _, raw_game in raw_games.iterrows():
         school_2=raw_game["school_2"],
         school_2_seed=raw_game["school_2_seed"],
         school_1_won=None,  # Don't use this
-    ) 
+    )
     games.append(game)
 
 
