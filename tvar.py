@@ -9,7 +9,7 @@ from tools import file_lib, odds_lib
 
 def one_sim_bankrupcy(bets: pd.DataFrame, bankroll: float, unit: float) -> bool:
     wallet = bankroll
-    for bet in bets:
+    for _, bet in bets.iterrows():
         odds, bet_size = bet["money_line"], bet["bet_size"]
         lay = odds_lib.lay_from_odds(odds) * bet_size * unit
         if random.random() < odds_lib.prob_from_odds(odds):
