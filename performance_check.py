@@ -1,3 +1,5 @@
+"""Checks how often random guesses reach given performance."""
+
 import random
 from typing import List
 
