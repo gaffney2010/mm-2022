@@ -14,10 +14,10 @@ import pandas as pd
 
 from models import bradley_terry, page_rank, seed
 from shared_types import *
-from tools import file
+from tools import file_lib
 
 
-raw_games = file.read_csv("manual_input_2022")
+raw_games = file_lib.read_csv("manual_input_2022")
 
 games = list()
 for _, raw_game in raw_games.iterrows():
@@ -58,4 +58,4 @@ for game in games:
     data.append(row_from_game(game.flip()))
 
 df = pd.DataFrame(data)
-file.write_csv(df, year)
+file_lib.write_csv(df, year)

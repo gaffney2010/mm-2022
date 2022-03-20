@@ -4,7 +4,7 @@ import random
 
 import pandas as pd
 
-from tools import file, odds_lib
+from tools import file_lib, odds_lib
 
 
 def one_sim_bankrupcy(bets: pd.DataFrame, bankroll: float, unit: float) -> bool:
@@ -54,5 +54,5 @@ def find_unit(
     return mid
 
 
-bets = file.read_csv("2022_bets")
+bets = file_lib.read_csv("2022_bets")
 print(find_unit(bets, 1000, 0.1, eps=0.01))
