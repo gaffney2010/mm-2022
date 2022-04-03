@@ -196,6 +196,4 @@ graph.add_action("score-three", score_three)
 graph.add_action("tip-off", tip_off)
 
 graph.train(data)
-log = SimpleLogger()
-print(graph.simulate(teams=["duke", "north-carolina"], logger=log))
-# print(log.dump())
+print(markov.sims(graph, teams=["duke", "north-carolina"]))
