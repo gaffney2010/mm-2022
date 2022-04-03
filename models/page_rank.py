@@ -33,7 +33,6 @@ def pr_ranks(year: Year) -> Dict[School, float]:
     return pr
 
 
-# TODO: Use multiple years of experience
 # Returns scatter plot of page-rank diffence by win/loss
 @functools.lru_cache(100)
 def experience(years: Tuple[Year]) -> List[Tuple[float, float]]:

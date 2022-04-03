@@ -4,9 +4,10 @@ import os
 import traceback
 
 from constants import *
+from shared_types import *
 
 
-class StoppingError(Exception):
+class StoppingError(MmException):
     pass
 
 

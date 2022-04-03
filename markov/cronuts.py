@@ -12,10 +12,11 @@ import random
 import pandas as pd
 
 from markov import markov
+from shared_types import *
 from tools import scraper_tools
 
 
-class ParseError(Exception):
+class ParseError(ScapingException):
     pass
 
 

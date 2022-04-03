@@ -11,6 +11,14 @@ Year = int
 LogRegType = Any
 
 
+class MmException(Exception):
+    pass
+
+
+class ScrapingException(Exception):
+    pass
+
+
 @attr.s(frozen=True)
 class Game(object):
     winner: School = attr.ib()

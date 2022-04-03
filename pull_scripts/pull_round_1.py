@@ -51,8 +51,7 @@ def read_quadrant(html: str, year: Year, seeds_found) -> List[PlayoffGame]:
             ):
                 # Known exception: Oregon / VCU forfeit
                 continue
-            # TODO: Better exceptions
-            raise Exception
+            raise ScrapingException("Not 1 school found to win")
 
         try:
             soup_1 = BeautifulSoup(school_split[1], features="lxml")

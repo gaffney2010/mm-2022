@@ -47,7 +47,7 @@ def _open_school_page(
             if req not in df.columns:
                 logging.debug(f"Available columns: {df.columns}")
                 logging.error(f"Bad df - no {req} column")
-                raise Exception(f"Bad df - no {req} column")
+                raise ScrapingException(f"Bad df - no {req} column")
     except:
         # TODO: Check for a link on that cell.
         _, _, exc_traceback = sys.exc_info()

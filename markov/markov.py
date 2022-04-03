@@ -20,7 +20,7 @@ SECONDS_IN_HALF = 60 * 20
 TIP_OFF = "tip-off"
 
 
-class MarkovError(Exception):
+class MarkovError(MmException):
     pass
 
 
