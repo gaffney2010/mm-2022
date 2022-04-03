@@ -29,7 +29,7 @@ def score_diff(y: str, x: str) -> int:
     x_parse = x.split(" - ")
     if len(x_parse) != 2:
         return -1
-    
+
     try:
         ya, yb = int(y_parse[0]), int(y_parse[1])
         xa, xb = int(x_parse[0]), int(x_parse[1])
@@ -73,10 +73,10 @@ url = "https://www.espn.com/mens-college-basketball/playbyplay/_/gameId/40140863
 html = scraper_tools.read_url_to_string(url)
 html = html.replace(
     '<img class="team-logo" src="https://a.espncdn.com/combiner/i?img=/i/teamlogos/ncaa/500/150.png&amp;h=100&amp;w=100">',
-    'duke'
+    "duke",
 ).replace(
     '<img class="team-logo" src="https://a.espncdn.com/combiner/i?img=/i/teamlogos/ncaa/500/153.png&amp;h=100&amp;w=100">',
-    'north-carolina'
+    "north-carolina",
 )
 dfs = pd.read_html(html)
 
@@ -95,13 +95,13 @@ for df_i in range(1, 3):
 
         # print(row)
 
-        if i+1 == len(half):
+        if i + 1 == len(half):
             # Because we have to look one-ahead
             break
 
         # We have to look one step ahead to know if this is a recordable move.
         # TODO: Handle this with a buffer to avoid the random-access.
-        if row["team"] == half.iloc[i+1]["team"]:
+        if row["team"] == half.iloc[i + 1]["team"]:
             # print("Maintain Possession")
             continue
 
@@ -188,7 +188,9 @@ class SimpleLogger(markov.SimLogger):
 
 
 graph = markov.Graph()
-graph.add_node("Play", ["offense"], ["turn-over", "score-one", "score-two", "score-three"])
+graph.add_node(
+    "Play", ["offense"], ["turn-over", "score-one", "score-two", "score-three"]
+)
 graph.add_action("turn-over", turn_over)  # functions turn_over, etc. defined elsewhere
 graph.add_action("score-one", score_one)
 graph.add_action("score-two", score_two)

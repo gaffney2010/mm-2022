@@ -1,4 +1,4 @@
-'''Make sure that categories work as expected.'''
+"""Make sure that categories work as expected."""
 
 import pandas as pd
 from sklearn.linear_model import LogisticRegression
