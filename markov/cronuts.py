@@ -16,7 +16,7 @@ from shared_types import *
 from tools import scraper_tools
 
 
-class ParseError(ScapingException):
+class ParseError(ScrapingException):
     pass
 
 
@@ -83,7 +83,7 @@ dfs = pd.read_html(html)
 for df_i in range(1, 3):
     half = dfs[df_i][["time", "team", "SCORE"]]
     # Add sentiel to get loop to run on last row
-    half.append({"time": "0:00", "team": "NEITHER", "SCORE": None})
+    half.append({"time": "0:00", "team": "NEITHER", "SCORE": None}, ignore_index=True)
 
     new, time, score = True, None, None
     data = list()
@@ -105,12 +105,7 @@ for df_i in range(1, 3):
 
         # print(row)
 
-        if i + 1 == len(half):
-            # Because we have to look one-ahead
-            break
-
         # We have to look one step ahead to know if this is a recordable move.
-        # TODO: Handle this with a buffer to avoid the random-access.
         if row["team"] == next_row["team"]:
             # print("Maintain Possession")
             continue
