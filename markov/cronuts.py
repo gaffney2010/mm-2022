@@ -82,10 +82,20 @@ dfs = pd.read_html(html)
 
 for df_i in range(1, 3):
     half = dfs[df_i][["time", "team", "SCORE"]]
+    # Add sentiel to get loop to run on last row
+    half.append({"time": "0:00", "team": "NEITHER", "SCORE": None})
 
     new, time, score = True, None, None
     data = list()
-    for i, row in half.iterrows():
+    row, next_row = None, None
+    for _, _row in half.iterrows():
+        # Translate _row into row / next_row paradigm
+        if next_row is None:
+            next_row = _row
+            continue
+        row = next_row
+        next_row = _row
+
         if new:
             time = row["time"]
             score = row["SCORE"]
@@ -101,7 +111,7 @@ for df_i in range(1, 3):
 
         # We have to look one step ahead to know if this is a recordable move.
         # TODO: Handle this with a buffer to avoid the random-access.
-        if row["team"] == half.iloc[i + 1]["team"]:
+        if row["team"] == next_row["team"]:
             # print("Maintain Possession")
             continue
 
