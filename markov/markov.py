@@ -21,14 +21,14 @@ class State(object):
     def __init__(self):
         self._state = dict()
 
-    def __setattr__(self, __name: str, __value: Any) -> None:
-        self._state[__name] = __value
+    def __setitem__(self, name: str, value: Any) -> None:
+        self._state[name] = value
 
-    def __getattribute__(self, __name: str) -> Any:
-        return self._state[__name]
+    def __getitem__(self, name: str) -> Any:
+        return self._state[name]
 
-    def __contains__(self, __name: str) -> bool:
-        return __name in self._state
+    def __contains__(self, name: str) -> bool:
+        return name in self._state
 
 
 class Histogram(object):
@@ -44,7 +44,7 @@ class Histogram(object):
         r = random.randint(1, self._denom)
         for k, v in self._histogram.items():
             r -= v
-            if r >= 0:
+            if r <= 0:
                 return k
         else:
             raise MarkovError("Histogram sample didn't converge")
@@ -89,20 +89,24 @@ class Node(object):
             for s in self.states:
                 state_values[s].add(datum.state[s])
         self.state_values = {k: list(v) for k, v in state_values.items()}
-        for v in state_values.values:
+        for v in state_values.values():
             self.num_values += len(v)
 
-        X = np.stack((self._row_from_datum(datum) for datum in data))
+        X = np.stack((self._row_from_state(datum.state) for datum in data))
         y = [datum.action_id for datum in data]
 
         self.model = LogisticRegression().fit(X, y)
 
+        # Also do the histogram
+        for datum in data:
+            self.histogram.push(datum.duration)
+
     def simulate(self, state: State) -> Tuple[Second, ActionId]:
         assert self.model is not None
         X = [self._row_from_state(state)]
-        pred = self.model.predict_proba(X)
+        pred = self.model.predict_proba(X)[0]
         r = random.random()
-        for action, prob in zip(self.model.classes, pred):
+        for action, prob in zip(self.model.classes_, pred):
             r -= prob
             # TODO: Replace this with a small epsilon to handle rounding error corner cases.
             if r <= 0:
@@ -136,6 +140,7 @@ class Graph(object):
         self.actions[id] = action
 
     def train(self, data: List[Datum]) -> None:
+        # TODO: This fails in multistate, because it sends all data to all nodes.
         for node in self.nodes.values():
             node.train(data)
 

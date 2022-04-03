@@ -7,6 +7,8 @@ This Graph would have a node, Play, with actions: turn-over, score-one, score-tw
 Note the convention established here that nodes are Pascal case and actions are hypenated.
 """
 
+import random
+
 import pandas as pd
 
 # TODO: Import local files better?
@@ -130,10 +132,60 @@ for df_i in range(1, 3):
             state={"offense": possesion},
             action_id=action_id,
         )
-        print(datum)
+        # print(datum)
         data.append(datum)
 
         # Update these
         time = row["time"]
         possesion = row["team"]
         score = row["SCORE"]
+
+
+def _flip_team(state: markov.State) -> None:
+    if state["offense"] == "duke":
+        state["offense"] = "north-carolina"
+    elif state["offense"] == "north-carolina":
+        state["offense"] = "duke"
+    else:
+        # TODO: Overload __str__ and __repr__ on state.
+        raise ParseError(f"Unexpected team encountered in: {state}")
+
+
+def turn_over(state: markov.State) -> markov.NodeId:
+    _flip_team(state)
+    return "Play"
+
+
+def score_one(state: markov.State) -> markov.NodeId:
+    state["_scores"][state["offense"]] += 1
+    _flip_team(state)
+    return "Play"
+
+
+def score_two(state: markov.State) -> markov.NodeId:
+    state["_scores"][state["offense"]] += 2
+    _flip_team(state)
+    return "Play"
+
+
+def score_three(state: markov.State) -> markov.NodeId:
+    state["_scores"][state["offense"]] += 3
+    _flip_team(state)
+    return "Play"
+
+
+def tip_off(state: markov.State) -> markov.NodeId:
+    state["offense"] = "duke" if random.random() < 0.5 else "north-carolina"
+    return "Play"
+
+
+graph = markov.Graph()
+graph.add_node("Play", ["offense"], ["turn-over", "score-one", "score-two", "score-three"])
+graph.add_action("turn-over", turn_over)  # functions turn_over, etc. defined elsewhere
+graph.add_action("score-one", score_one)
+graph.add_action("score-two", score_two)
+graph.add_action("score-three", score_three)
+graph.add_action("tip-off", tip_off)
+
+graph.train(data)
+print(graph.simulate(teams=["duke", "north-carolina"]))
