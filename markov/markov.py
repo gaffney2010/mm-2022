@@ -164,7 +164,9 @@ class Graph(object):
             node.train(data)
 
     # TODO: Import School type
-    def simulate(self, teams: List[str], logger: SimLogger = SimLogger()) -> Dict[str, int]:
+    def simulate(
+        self, teams: List[str], logger: SimLogger = SimLogger()
+    ) -> Dict[str, int]:
         # Special states
         self.state["_teams"] = teams
         self.state["_scores"] = {t: 0 for t in teams}
@@ -185,7 +187,7 @@ class Graph(object):
             log_entry.append(node_id)
             logger.append(";".join(log_entry))
             log_entry = list()
-            
+
             while True:
                 duration, action_id = self.nodes[node_id].simulate(self.state)
                 clock -= duration
