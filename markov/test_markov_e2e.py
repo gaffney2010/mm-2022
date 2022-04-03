@@ -15,7 +15,7 @@ class TestMarkovE2e(unittest.TestCase):
         graph.add_action("score-one", cronuts.score_one)
         graph.add_action("score-two", cronuts.score_two)
         graph.add_action("score-three", cronuts.score_three)
-        graph.add_action("tip-off", cronuts.tip_off)
+        graph.add_action(markov.TIP_OFF, cronuts.tip_off)
 
         graph.train(cronuts.data)
         actual = markov.sims(graph, teams=["duke", "north-carolina"], num_sims=100)

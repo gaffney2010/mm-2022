@@ -8,12 +8,16 @@ import pandas as pd
 from sklearn.linear_model import LogisticRegression
 import tqdm
 
+from shared_types import *
+
 Second = int
 StateVar = str
 ActionId = str
 NodeId = str
 
 EPSILON = 1e-6  # Some small number
+SECONDS_IN_HALF = 60 * 20
+TIP_OFF = "tip-off"
 
 
 class MarkovError(Exception):
@@ -162,9 +166,8 @@ class Graph(object):
         for node in self.nodes.values():
             node.train(data)
 
-    # TODO: Import School type
     def simulate(
-        self, teams: List[str], logger: SimLogger = SimLogger()
+        self, teams: List[School], logger: SimLogger = SimLogger()
     ) -> Dict[str, int]:
         # state is simulation-specific
         state = State()
@@ -179,12 +182,11 @@ class Graph(object):
         for _ in range(2):
             log_entry = list()
 
-            # TODO: Use constants instead of literals
-            clock = 60 * 20
-            node_id = self.actions["tip-off"](state)
+            clock = SECONDS_IN_HALF
+            node_id = self.actions[TIP_OFF](state)
             # TODO: Refactor to avoid repeated code.
             log_entry.append(str(clock))
-            log_entry.append("tip-off")
+            log_entry.append(TIP_OFF)
             log_entry.append(str(state))
             log_entry.append(node_id)
             logger.append(";".join(log_entry))
@@ -206,7 +208,7 @@ class Graph(object):
         return state["_scores"]
 
 
-def sims(graph: Graph, teams: List[str], num_sims: int = 1000) -> Dict[str, float]:
+def sims(graph: Graph, teams: List[School], num_sims: int = 1000) -> Dict[str, float]:
     """We may have ties."""
     assert len(teams) == 2
 

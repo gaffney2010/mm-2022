@@ -194,7 +194,7 @@ graph.add_action("turn-over", turn_over)  # functions turn_over, etc. defined el
 graph.add_action("score-one", score_one)
 graph.add_action("score-two", score_two)
 graph.add_action("score-three", score_three)
-graph.add_action("tip-off", tip_off)
+graph.add_action(markov.TIP_OFF, tip_off)
 
 # graph.train(data)
 # print(markov.sims(graph, teams=["duke", "north-carolina"]))
