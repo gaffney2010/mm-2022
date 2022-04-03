@@ -63,12 +63,12 @@ def conf_bt_season(year: Year) -> Dict[School, float]:
     for i, match in enumerate(matches):
         target_winner = random.random() < 0.5
         if target_winner:
-            X[i, ind_conf.get(match.winner_conf)] = 1
-            X[i, ind_conf.get(match.loser_conf)] = -1
+            X[i, ind_conf[match.winner_conf]] = 1
+            X[i, ind_conf[match.loser_conf]] = -1
             y.append(1)
         else:
-            X[i, ind_conf.get(match.winner_conf)] = -1
-            X[i, ind_conf.get(match.loser_conf)] = 1
+            X[i, ind_conf[match.winner_conf]] = -1
+            X[i, ind_conf[match.loser_conf]] = 1
             y.append(0)
 
     model = LogisticRegression().fit(X, y)
