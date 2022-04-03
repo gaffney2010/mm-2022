@@ -132,7 +132,7 @@ for df_i in range(1, 3):
             state={"offense": possesion},
             action_id=action_id,
         )
-        # print(datum)
+        print(datum)
         data.append(datum)
 
         # Update these
@@ -199,5 +199,5 @@ graph.add_action("tip-off", tip_off)
 
 graph.train(data)
 log = SimpleLogger()
-print(graph.simulate(teams=["duke", "north-carolina"], logger=log))
-print(log.dump())
+# print(graph.simulate(teams=["duke", "north-carolina"], logger=log))
+# print(log.dump())
