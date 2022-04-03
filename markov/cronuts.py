@@ -83,12 +83,11 @@ dfs = pd.read_html(html)
 for df_i in range(1, 3):
     half = dfs[df_i][["time", "team", "SCORE"]]
 
-    new, time, possesion, score = True, None, None, None
+    new, time, score = True, None, None
     data = list()
     for i, row in half.iterrows():
         if new:
             time = row["time"]
-            possesion = row["team"]
             score = row["SCORE"]
             new = False
             print("New")
@@ -129,15 +128,14 @@ for df_i in range(1, 3):
         datum = markov.Datum(
             duration=duration,
             node_id="Play",
-            state={"offense": possesion},
+            state={"offense": row["team"]},
             action_id=action_id,
         )
-        print(datum)
+        # print(datum)
         data.append(datum)
 
         # Update these
         time = row["time"]
-        possesion = row["team"]
         score = row["SCORE"]
 
 
@@ -199,5 +197,5 @@ graph.add_action("tip-off", tip_off)
 
 graph.train(data)
 log = SimpleLogger()
-# print(graph.simulate(teams=["duke", "north-carolina"], logger=log))
+print(graph.simulate(teams=["duke", "north-carolina"], logger=log))
 # print(log.dump())
