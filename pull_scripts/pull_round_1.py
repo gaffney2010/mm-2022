@@ -83,10 +83,8 @@ def read_quadrant(html: str, year: Year, seeds_found) -> List[PlayoffGame]:
         )
         if random.random() > 0.5:
             game = game.flip()
-            # TODO: Fix this nonsense
-            result.append(game)
-        else:
-            result.append(game)
+
+        result.append(game)
 
     return result
 
