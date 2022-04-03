@@ -13,6 +13,8 @@ StateVar = str
 ActionId = str
 NodeId = str
 
+EPSILON = 1e-6  # Some small number
+
 
 class MarkovError(Exception):
     pass
@@ -115,8 +117,7 @@ class Node(object):
         r = random.random()
         for action, prob in zip(self.model.classes_, pred):
             r -= prob
-            # TODO: Replace this with a small epsilon to handle rounding error corner cases.
-            if r <= 0:
+            if r <= EPSILON:
                 return self.histogram.sample(), action
         else:
             raise MarkovError("No action selected.")
@@ -145,8 +146,6 @@ class Graph(object):
     def __init__(self):
         self.nodes = dict()
         self.actions = dict()
-        # TODO: This should be a local variable of simulate.
-        self.state = State()
 
     def add_node(
         self, id: NodeId, states: List[StateVar], actions: List[ActionId]
@@ -167,9 +166,12 @@ class Graph(object):
     def simulate(
         self, teams: List[str], logger: SimLogger = SimLogger()
     ) -> Dict[str, int]:
+        # state is simulation-specific
+        state = State()
+
         # Special states
-        self.state["_teams"] = teams
-        self.state["_scores"] = {t: 0 for t in teams}
+        state["_teams"] = teams
+        state["_scores"] = {t: 0 for t in teams}
 
         logger.append("clock;action;state;node")
 
@@ -179,29 +181,29 @@ class Graph(object):
 
             # TODO: Use constants instead of literals
             clock = 60 * 20
-            node_id = self.actions["tip-off"](self.state)
+            node_id = self.actions["tip-off"](state)
             # TODO: Refactor to avoid repeated code.
             log_entry.append(str(clock))
             log_entry.append("tip-off")
-            log_entry.append(str(self.state))
+            log_entry.append(str(state))
             log_entry.append(node_id)
             logger.append(";".join(log_entry))
             log_entry = list()
 
             while True:
-                duration, action_id = self.nodes[node_id].simulate(self.state)
+                duration, action_id = self.nodes[node_id].simulate(state)
                 clock -= duration
                 if clock < 0:
                     break
-                node_id = self.actions[action_id](self.state)
+                node_id = self.actions[action_id](state)
                 log_entry.append(str(clock))
                 log_entry.append(action_id)
-                log_entry.append(str(self.state))
+                log_entry.append(str(state))
                 log_entry.append(node_id)
                 logger.append(";".join(log_entry))
                 log_entry = list()
 
-        return self.state["_scores"]
+        return state["_scores"]
 
 
 def sims(graph: Graph, teams: List[str], num_sims: int = 1000) -> Dict[str, float]:
