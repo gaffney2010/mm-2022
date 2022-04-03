@@ -11,6 +11,7 @@ import random
 
 import pandas as pd
 
+# import markov
 from markov import markov
 from shared_types import *
 from tools import scraper_tools
@@ -80,13 +81,13 @@ html = html.replace(
 )
 dfs = pd.read_html(html)
 
+data = list()
 for df_i in range(1, 3):
     half = dfs[df_i][["time", "team", "SCORE"]]
     # Add sentiel to get loop to run on last row
     half.append({"time": "0:00", "team": "NEITHER", "SCORE": None}, ignore_index=True)
 
     new, time, score = True, None, None
-    data = list()
     row, next_row = None, None
     for _, _row in half.iterrows():
         # Translate _row into row / next_row paradigm
@@ -190,17 +191,3 @@ class SimpleLogger(markov.SimLogger):
 
     def dump(self) -> str:
         return "\n".join(self.pad)
-
-
-graph = markov.Graph()
-graph.add_node(
-    "Play", ["offense"], ["turn-over", "score-one", "score-two", "score-three"]
-)
-graph.add_action("turn-over", turn_over)  # functions turn_over, etc. defined elsewhere
-graph.add_action("score-one", score_one)
-graph.add_action("score-two", score_two)
-graph.add_action("score-three", score_three)
-graph.add_action(markov.TIP_OFF, tip_off)
-
-# graph.train(data)
-# print(markov.sims(graph, teams=["duke", "north-carolina"]))

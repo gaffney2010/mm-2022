@@ -87,7 +87,6 @@ class Node(object):
                 i += 1
         return result
 
-    # TODO: Profile and improve
     def train(self, data: List["Datum"]) -> None:
         # Start with assertions
         for datum in data:
