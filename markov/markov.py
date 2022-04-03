@@ -50,10 +50,9 @@ class Histogram(object):
             raise MarkovError("Histogram sample didn't converge")
 
 
-Action = Callable[[State], 'Node']
+Action = Callable[[State], "Node"]
 
 
-# TODO: Run black
 class Node(object):
     def __init__(self, id: NodeId, states: List[StateVar], actions: List[ActionId]):
         self.id = id
@@ -76,7 +75,7 @@ class Node(object):
         return result
 
     # TODO: Profile and improve
-    def train(self, data: List['Datum']) -> None:
+    def train(self, data: List["Datum"]) -> None:
         # Start with assertions
         for datum in data:
             assert datum.node_id == self.id
@@ -126,7 +125,9 @@ class Graph(object):
         self.actions = dict()
         self.state = State()
 
-    def add_node(self, id: NodeId, states: List[StateVar], actions: List[ActionId]) -> None:
+    def add_node(
+        self, id: NodeId, states: List[StateVar], actions: List[ActionId]
+    ) -> None:
         assert id not in self.nodes
         self.nodes[id] = Node(id, states, actions)
 
