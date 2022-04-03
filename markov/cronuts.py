@@ -11,8 +11,7 @@ import random
 
 import pandas as pd
 
-# TODO: Import local files better?
-import markov
+from markov import markov
 from tools import scraper_tools
 
 
@@ -197,5 +196,5 @@ graph.add_action("score-two", score_two)
 graph.add_action("score-three", score_three)
 graph.add_action("tip-off", tip_off)
 
-graph.train(data)
-print(markov.sims(graph, teams=["duke", "north-carolina"]))
+# graph.train(data)
+# print(markov.sims(graph, teams=["duke", "north-carolina"]))
