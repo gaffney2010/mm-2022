@@ -32,8 +32,8 @@ def get_schools(year: Year) -> Dict[str, School]:
     return schools
 
 
-def _school_field(raw: str) -> School:
-    return raw.split("\xa0")[0]
+def _parse_opponent(row: Dict) -> School:
+    return row["Opponent"].split("\xa0")[0]
 
 
 def _open_school_page(
@@ -78,11 +78,9 @@ def get_conf_from_school_page(school: School, year: Year) -> Dict[School, Conf]:
         if not has_columns(row, ["Conf", "Opponent"]):
             continue
 
-        # TODO: Clean this up a little to share code maybe.
         try:
-            opponent = get_schools(year)[_school_field(row["Opponent"])]
+            opponent = get_schools(year)[_parse_opponent(row)]
         except:
-            opponent = row["Opponent"]
             logger.log_error(
                 f"Couldn't find key for school {opponent} found on school {school}, continuing with non_key",
                 stop_program=False,
@@ -112,13 +110,14 @@ def get_reg_season_school(school: School, year: Year) -> List[Game]:
         count_games += 1
 
         try:
-            opponent = get_schools(year)[_school_field(row["Opponent"])]
+            opponent = get_schools(year)[_parse_opponent(row)]
         except:
             logger.log_error(
                 f"Couldn't find key for school {row['Opponent']} found on school {school}, continuing with non_key",
                 stop_program=False,
             )
-            opponent = _school_field(row["Opponent"]).replace(" ", "-").upper()
+            # Create a default key
+            opponent = _parse_opponent(row).replace(" ", "-").upper()
 
         outcome = row[outcome_col]
         if outcome == "W":
