@@ -22,7 +22,7 @@ def shuffle(sizes: List[float]) -> List[float]:
         b = game_order[i] + 1 - flips[i]
         result.append(sizes[a])
         result.append(sizes[b])
-    
+
     return result
 
 
