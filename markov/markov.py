@@ -1,6 +1,10 @@
 from collections import defaultdict
 import random
-from typing import Any, Callable, DefaultDict, List
+from typing import Any, Callable, DefaultDict, Dict, List
+
+import attr
+import pandas as pd
+from sklearn.linear_model import LogisticRegression
 
 Second = int
 StateVar = str
@@ -21,6 +25,9 @@ class State(object):
 
     def __getattribute__(self, __name: str) -> Any:
         return self._state[__name]
+
+    def __contains__(self, __name: str) -> bool:
+        return __name in self._state
 
 
 class Histogram(object):
@@ -47,11 +54,45 @@ Action = Callable[[State], 'Node']
 
 # TODO: Run black
 class Node(object):
+    # TODO: Consider making these sets.
     def __init__(self, id: NodeId, states: List[StateVar], actions: List[ActionId]):
         self.id = id
         self.states = states
         self.actions = actions
         self.histogram = Histogram()
+        self.model = None
+
+    # TODO: Profile and improve
+    def train(self, data: List['Datum']) -> None:
+        rows = list()
+        for datum in data:
+            assert datum.node_id == self.id
+            assert datum.action_id in self.actions
+            row = dict()
+            for s in self.states:
+                assert s in datum.state
+                row[s] = datum.state[s]
+            row["target"] = datum.action_id
+            rows.append(row)
+
+            self.histogram.push(datum.duration)
+        df = pd.DataFrame(rows)
+
+        dummy_dfs = list()
+        for s in self.states:
+            dummy_dfs.append(pd.get_dummies(df[s]))
+        X = pd.concat(dummy_dfs, axis=1)
+        y = df["target"]
+
+        self.model = LogisticRegression().fit(X, y)
+
+
+@attr.s(frozen=True)
+class Datum(object):
+    duration: Second = attr.ib()
+    node_id: NodeId = attr.ib()
+    state: State = attr.ib()
+    action_id: ActionId = attr.ib()
 
 
 class Graph(object):
@@ -67,3 +108,10 @@ class Graph(object):
     def add_action(self, id: ActionId, action: Action) -> None:
         assert id not in self.actions
         self.actions[id] = action
+
+    def train(self, data: List[Datum]) -> None:
+        pass
+
+    # TODO: Import School type
+    def simulate(self, teams: List[str]) -> Dict[str, float]:
+        pass

@@ -22,7 +22,7 @@ Note: There's no good way to validate a graph today.  That is we can't check tha
 
 ### Datum
 
-(Starting time, node name, state dict, action name)
+(duration, node name, state dict, action name)
 
 ## Example
 As a V1 model, we'll do turn-over and score as the only actions.  With score-one (for fouls), score-two, and score-three as specific types of scores, with the assumption that the turn-over follows.  Notice that an offensive recovery after a missed one-and-one violates this assumption.  We build robustly enough that this is okay.  That is assumptions may be violated in training, but not in simulations.
