@@ -183,30 +183,24 @@ class Graph(object):
 
         # Two halfs
         for _ in range(2):
-            log_entry = list()
-
             clock = SECONDS_IN_HALF
             node_id = self.actions[TIP_OFF](state)
-            # TODO: Refactor to avoid repeated code.
-            log_entry.append(str(clock))
-            log_entry.append(TIP_OFF)
-            log_entry.append(str(state))
-            log_entry.append(node_id)
-            logger.append(";".join(log_entry))
-            log_entry = list()
 
+            log_entry = list()
             while True:
+                # Log previous action
+                log_entry.append(str(clock))
+                log_entry.append(TIP_OFF)
+                log_entry.append(str(state))
+                log_entry.append(node_id)
+                logger.append(";".join(log_entry))
+                log_entry = list()
+
                 duration, action_id = self.nodes[node_id].simulate(state)
                 clock -= duration
                 if clock < 0:
                     break
                 node_id = self.actions[action_id](state)
-                log_entry.append(str(clock))
-                log_entry.append(action_id)
-                log_entry.append(str(state))
-                log_entry.append(node_id)
-                logger.append(";".join(log_entry))
-                log_entry = list()
 
         return state["_scores"]
 
