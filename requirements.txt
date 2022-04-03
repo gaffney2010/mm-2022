@@ -9,4 +9,4 @@ selenium
 sklearn
 tabulate
 tqdm
-traceback
+-e .
