@@ -30,6 +30,12 @@ class State(object):
     def __contains__(self, name: str) -> bool:
         return name in self._state
 
+    def __str__(self) -> str:
+        return str(self._state)
+
+    def __repr__(self) -> str:
+        return str(self)
+
 
 class Histogram(object):
     def __init__(self):
@@ -123,10 +129,22 @@ class Datum(object):
     action_id: ActionId = attr.ib()
 
 
+class SimLogger(object):
+    def __init__(self):
+        pass
+
+    def append(self, s: str) -> None:
+        pass
+
+    def dump(self) -> str:
+        pass
+
+
 class Graph(object):
     def __init__(self):
         self.nodes = dict()
         self.actions = dict()
+        # TODO: This should be a local variable of simulate.
         self.state = State()
 
     def add_node(
@@ -145,22 +163,39 @@ class Graph(object):
             node.train(data)
 
     # TODO: Import School type
-    def simulate(self, teams: List[str]) -> Dict[str, float]:
+    def simulate(self, teams: List[str], logger: SimLogger = SimLogger()) -> Dict[str, float]:
         # Special states
         self.state["_teams"] = teams
         self.state["_scores"] = {t: 0 for t in teams}
 
+        logger.append("clock;action;state;node")
+
         # Two halfs
         for _ in range(2):
+            log_entry = list()
+
             # TODO: Use constants instead of literals
             clock = 60 * 20
             node_id = self.actions["tip-off"](self.state)
-
+            # TODO: Refactor to avoid repeated code.
+            log_entry.append(str(clock))
+            log_entry.append("tip-off")
+            log_entry.append(str(self.state))
+            log_entry.append(node_id)
+            logger.append(";".join(log_entry))
+            log_entry = list()
+            
             while True:
                 duration, action_id = self.nodes[node_id].simulate(self.state)
                 clock -= duration
                 if clock < 0:
                     break
                 node_id = self.actions[action_id](self.state)
+                log_entry.append(str(clock))
+                log_entry.append(action_id)
+                log_entry.append(str(self.state))
+                log_entry.append(node_id)
+                logger.append(";".join(log_entry))
+                log_entry = list()
 
         return self.state["_scores"]

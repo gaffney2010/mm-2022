@@ -147,7 +147,6 @@ def _flip_team(state: markov.State) -> None:
     elif state["offense"] == "north-carolina":
         state["offense"] = "duke"
     else:
-        # TODO: Overload __str__ and __repr__ on state.
         raise ParseError(f"Unexpected team encountered in: {state}")
 
 
@@ -179,6 +178,17 @@ def tip_off(state: markov.State) -> markov.NodeId:
     return "Play"
 
 
+class SimpleLogger(markov.SimLogger):
+    def __init__(self):
+        self.pad = list()
+
+    def append(self, s: str) -> None:
+        self.pad.append(s)
+
+    def dump(self) -> str:
+        return "\n".join(self.pad)
+
+
 graph = markov.Graph()
 graph.add_node("Play", ["offense"], ["turn-over", "score-one", "score-two", "score-three"])
 graph.add_action("turn-over", turn_over)  # functions turn_over, etc. defined elsewhere
@@ -188,4 +198,6 @@ graph.add_action("score-three", score_three)
 graph.add_action("tip-off", tip_off)
 
 graph.train(data)
-print(graph.simulate(teams=["duke", "north-carolina"]))
+log = SimpleLogger()
+print(graph.simulate(teams=["duke", "north-carolina"], logger=log))
+print(log.dump())
