@@ -12,15 +12,14 @@ from tools import logger, scraper_tools
 from shared_types import *
 
 
-# TODO: Rename these.
-FULL_YEAR = "https://www.sports-reference.com/cbb/seasons/{}-school-stats.html"
-SCHEDULE = "https://www.sports-reference.com/cbb/schools/{}/{}-schedule.html"
+SCHOOLS_BY_YEAR = "https://www.sports-reference.com/cbb/seasons/{}-school-stats.html"
+GAMES_BY_YEAR_SCHOOL = "https://www.sports-reference.com/cbb/schools/{}/{}-schedule.html"
 
 
 @functools.lru_cache(100)
 def get_schools(year: Year) -> Dict[str, School]:
     # All schools in a given year mapped from representative string to the school
-    html = scraper_tools.read_url_to_string(FULL_YEAR.format(year))
+    html = scraper_tools.read_url_to_string(SCHOOLS_BY_YEAR.format(year))
     soup = BeautifulSoup(html, features="lxml")
     raw_schools = soup.find_all("td", {"data-stat": "school_name"})
     schools = dict()
@@ -41,7 +40,7 @@ def _open_school_page(
 ) -> Optional[pd.DataFrame]:
     """Will report any errors for you, and return None"""
     try:
-        html = scraper_tools.read_url_to_string(SCHEDULE.format(school, year))
+        html = scraper_tools.read_url_to_string(GAMES_BY_YEAR_SCHOOL.format(school, year))
         df = pd.read_html(html)[-1]
         for req in required_fields:
             if req not in df.columns:
