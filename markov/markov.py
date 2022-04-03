@@ -162,9 +162,12 @@ class Graph(object):
         self.actions[id] = action
 
     def train(self, data: List[Datum]) -> None:
-        # TODO: This fails in multistate, because it sends all data to all nodes.
-        for node in self.nodes.values():
-            node.train(data)
+        data_by_node = defaultdict(list)
+        for datum in data:
+            data_by_node[datum.node_id].append(datum)
+
+        for node_id, node_data in data_by_node.items():
+            self.nodes[node_id].train(node_data)
 
     def simulate(
         self, teams: List[School], logger: SimLogger = SimLogger()
