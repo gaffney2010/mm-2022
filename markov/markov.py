@@ -217,4 +217,4 @@ def sims(graph: Graph, teams: List[str], num_sims: int = 1000) -> Dict[str, floa
             win_prob[teams[0]] += 1.0 / num_sims
         if final_score[teams[0]] < final_score[teams[1]]:
             win_prob[teams[1]] += 1.0 / num_sims
-    return win_prob
+    return {k: round(v, 4) for k, v in win_prob.items()}
