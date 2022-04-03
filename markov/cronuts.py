@@ -7,9 +7,133 @@ This Graph would have a node, Play, with actions: turn-over, score-one, score-tw
 Note the convention established here that nodes are Pascal case and actions are hypenated.
 """
 
+import pandas as pd
+
+# TODO: Import local files better?
+import markov
 from tools import scraper_tools
+
+
+class ParseError(Exception):
+    pass
+
+
+def score_diff(y: str, x: str) -> int:
+    """I'm assuming that only teams in possession can score..."""
+    # Return -1 ignores the row
+    y_parse = y.split(" - ")
+    if len(y_parse) != 2:
+        return -1
+    x_parse = x.split(" - ")
+    if len(x_parse) != 2:
+        return -1
+    
+    try:
+        ya, yb = int(y_parse[0]), int(y_parse[1])
+        xa, xb = int(x_parse[0]), int(x_parse[1])
+    except:
+        return -1
+
+    a_fixed = ya == xa
+    b_fixed = yb == xb
+
+    if a_fixed:
+        # Returns 0 here if y == x
+        return yb - xb
+    if b_fixed:
+        return ya - xa
+
+    # Neither fixed.
+    # I'd like to understand this possibility better, so crash for now.
+    raise ParseError(f"Weird score {y} and {x}")
+
+
+def time_diff(y: str, x: str) -> markov.Second:
+    y_parse = y.split(":")
+    if len(y_parse) != 2:
+        raise ParseError()
+    x_parse = x.split(":")
+    if len(x_parse) != 2:
+        raise ParseError()
+
+    try:
+        y_min, y_sec = int(y_parse[0]), int(y_parse[1])
+        x_min, x_sec = int(x_parse[0]), int(x_parse[1])
+    except:
+        raise ParseError()
+
+    # -1 because clock counts down
+    return -1 * (y_min * 60 + y_sec - x_min * 60 - x_sec)
+
 
 url = "https://www.espn.com/mens-college-basketball/playbyplay/_/gameId/401408635"
 
 html = scraper_tools.read_url_to_string(url)
-print(html)
+html = html.replace(
+    '<img class="team-logo" src="https://a.espncdn.com/combiner/i?img=/i/teamlogos/ncaa/500/150.png&amp;h=100&amp;w=100">',
+    'duke'
+).replace(
+    '<img class="team-logo" src="https://a.espncdn.com/combiner/i?img=/i/teamlogos/ncaa/500/153.png&amp;h=100&amp;w=100">',
+    'north-carolina'
+)
+dfs = pd.read_html(html)
+
+for df_i in range(1, 3):
+    half = dfs[df_i][["time", "team", "SCORE"]]
+
+    new, time, possesion, score = True, None, None, None
+    data = list()
+    for i, row in half.iterrows():
+        if new:
+            time = row["time"]
+            possesion = row["team"]
+            score = row["SCORE"]
+            new = False
+            print("New")
+            continue
+
+        # print(row)
+
+        if i+1 == len(half):
+            # Because we have to look one-ahead
+            break
+
+        # We have to look one step ahead to know if this is a recordable move.
+        # TODO: Handle this with a buffer to avoid the random-access.
+        if row["team"] == half.iloc[i+1]["team"]:
+            # print("Maintain Possession")
+            continue
+
+        sd = score_diff(row["SCORE"], score)
+        if sd == 0:
+            action_id = "turn-over"
+        elif sd == 1:
+            action_id = "score-one"
+        elif sd == 2:
+            action_id = "score-two"
+        elif sd == 3:
+            action_id = "score-three"
+        else:
+            # Who knows why this happens.
+            print("Malformed score")
+            continue
+
+        try:
+            duration = time_diff(row["time"], time)
+        except ParseError:
+            # Malformed, who knows
+            print("Malformed time")
+
+        datum = markov.Datum(
+            duration=duration,
+            node_id="Play",
+            state={"offense": possesion},
+            action_id=action_id,
+        )
+        print(datum)
+        data.append(datum)
+
+        # Update these
+        time = row["time"]
+        possesion = row["team"]
+        score = row["SCORE"]
