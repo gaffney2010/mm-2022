@@ -14,7 +14,7 @@ import pandas as pd
 
 from models import bradley_terry, page_rank, seed
 from shared_types import *
-from tools import file_lib
+from tools import file_lib, game_lib
 
 
 raw_games = file_lib.read_csv("manual_input_2022")
@@ -32,30 +32,12 @@ for _, raw_game in raw_games.iterrows():
     games.append(game)
 
 
-seed_model = seed.train_model(list(range(1985, 2020)) + [2021])
-
-
-# TODO: Share with the other file, I guess.
-def row_from_game(game: PlayoffGame) -> Dict[str, Any]:
-    return {
-        "school": game.school_1,
-        "opponent": game.school_2,
-        "seed": game.school_1_seed,
-        "seed_prob": seed._infer_single_game(seed_model, game),
-        "bt": bradley_terry.bt(game),
-        # "pr": page_rank.page_ranks(game.year)[game.school_1],
-        "pr": page_rank.pr_ranks(game.year)[game.school_1],
-        "pr_prob": page_rank.infer(game, loess_years=(2022, 2021, 2020, 2019, 2018)),
-        "won": game.school_1_won,
-    }
-
-
 year = 2022
 
 data = list()
 for game in games:
-    data.append(row_from_game(game))
-    data.append(row_from_game(game.flip()))
+    data.append(game_lib.row_from_game(game))
+    data.append(game_lib.row_from_game(game.flip()))
 
 df = pd.DataFrame(data)
 file_lib.write_csv(df, year)
