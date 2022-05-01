@@ -30,10 +30,11 @@ class Game(object):
 class PlayoffGame(object):
     year: Year = attr.ib()
     school_1: School = attr.ib()
-    school_1_seed: int = attr.ib()
     school_2: School = attr.ib()
-    school_2_seed: int = attr.ib()
-    school_1_won: bool = attr.ib()
+    # 0 means that there's no seed.
+    school_1_seed: int = attr.ib(default=0)
+    school_2_seed: int = attr.ib(default=0)
+    school_1_won: Optional[bool] = attr.ib(default=None)
 
     def flip(self) -> "PlayoffGame":
         return PlayoffGame(

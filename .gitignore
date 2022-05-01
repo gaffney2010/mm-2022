@@ -142,3 +142,6 @@ logging/*.log
 # Don't save this stuff
 data/csv/*.csv
 2021.csv
+
+# I'm a hack.
+models/facades/top_level_dir.py

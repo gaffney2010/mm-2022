@@ -1,3 +1,4 @@
+argparse
 attrs
 beautifulsoup4
 lxml
